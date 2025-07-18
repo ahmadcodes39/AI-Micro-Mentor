@@ -1,0 +1,98 @@
+import React, { useContext, useEffect, useState } from "react";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
+import LandingPage from "./Pages/LandingPage";
+import LoginPage from "./Pages/LoginPage";
+import SignUpPage from "./Pages/SignUpPage";
+import Dashboard from "./Pages/Dashboard";
+import MyCourses from "./Pages/MyCourses";
+import CourseDetailPage from "./Pages/CourseDetailPage";
+import AppLayout from "./Components/Layout/AppLayout";
+import { getCurrentUser } from "./Components/API/authApi";
+import { AuthContext } from "./Components/Context/authContext";
+import LessonDetailPage from "./Pages/LessonDetailPage";
+
+const App = () => {
+  const [loading, setLoading] = useState(true);
+  const { currentUser, setCurrentUser } = useContext(AuthContext);
+
+  useEffect(() => {
+    const getUser = async () => {
+      const response = await getCurrentUser();
+      setCurrentUser(response?.user);
+      setLoading(false);
+    };
+    getUser();
+  }, []);
+  const isAuthenticated = Boolean(currentUser?._id);
+  console.log("current user ", currentUser);
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-48">
+        <span className="loading loading-dots loading-lg"></span>
+      </div>
+    );
+  }
+  return (
+    <div data-theme={"dark"}>
+      <Toaster position="top-right" />
+      <BrowserRouter>
+        <Routes>
+          <Route
+            path="/"
+            element={
+              isAuthenticated ? <Navigate to="/dashboard" /> : <LandingPage />
+            }
+          />
+          <Route
+            path="/register"
+            element={
+              isAuthenticated ? <Navigate to="/dashboard" /> : <SignUpPage />
+            }
+          />
+          <Route
+            path="/login"
+            element={
+              isAuthenticated ? <Navigate to={"/dashboard"} /> : <LoginPage />
+            }
+          />
+          <Route
+            path="/dashboard"
+            element={
+              <AppLayout showSideBar={true}>
+                {isAuthenticated ? <Dashboard /> : <Navigate to={"/"} />}
+              </AppLayout>
+            }
+          />
+          <Route
+            path="/course/:courseId/:topic"
+            element={
+              <AppLayout showSideBar={true}>
+                {isAuthenticated ? <CourseDetailPage /> : <Navigate to={"/"} />}
+              </AppLayout>
+            }
+          />
+          <Route
+            path="/my-courses"
+            element={
+              <AppLayout showSideBar={true}>
+                {isAuthenticated ? <MyCourses /> : <Navigate to={"/"} />}
+              </AppLayout>
+            }
+          />
+
+          <Route
+            path="/lesson/:courseId/:lessonId"
+            element={
+              <AppLayout showSideBar={true}>
+                {isAuthenticated ? <LessonDetailPage /> : <Navigate to={"/"} />}
+              </AppLayout>
+            }
+          />
+        </Routes>
+      </BrowserRouter>
+    </div>
+  );
+};
+
+export default App;
