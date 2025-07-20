@@ -20,7 +20,7 @@ import toast from "react-hot-toast";
 import { AuthContext } from "../Context/authContext";
 
 const SideBar = () => {
-  const { setCurrentUser } = useContext(AuthContext);
+  const { currentUser,setCurrentUser } = useContext(AuthContext);
   const navigate = useNavigate();
   const [isClose, setIsClose] = useState(false);
   const [imageError, setImageError] = useState(false);
@@ -68,7 +68,7 @@ const SideBar = () => {
               <Aperture className={`text-primary`} />
             ) : (
               <img
-                src="https://avatar.iran.liara.run/username?username=Ahmad%20Ali+Shah"
+                src={currentUser?.avatar}
                 className="rounded-full size-8"
                 alt="user avatar"
                 onError={() => setImageError(true)}

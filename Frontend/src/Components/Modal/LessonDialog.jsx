@@ -1,16 +1,31 @@
 import React, { useState } from "react";
+import { addLesson } from "../API/lessonApi";
+import { useParams } from "react-router";
+import toast from "react-hot-toast";
+import { Bot } from "lucide-react";
 
-const LessonDialog = () => {
+const LessonDialog = ({refreshLessons}) => {
   const [lessonTitle, setLessonTitle] = useState("");
+  const [loading, setLoading] = useState(false);
+  const { courseId, topic:courseName } = useParams();
+  
 
-  const handleCreate = (e) => {
+  const handleCreate = async (e) => {
     e.preventDefault();
+    console.log("ID ",courseId)
+    console.log("Course Name ",courseName)
+    console.log("lesson Title ",lessonTitle)
+    setLoading(true);
     if (!lessonTitle.trim()) return;
-
-    console.log("Creating lesson by agent:", lessonTitle);
-    // TODO: Call your agent or API here
+    const response = await addLesson(courseId, lessonTitle,courseName);
+    if (response) {
+      toast.success(response.message);
+      console.log(response);
+    }
     setLessonTitle("");
+    setLoading(false);
     document.getElementById("my_modal_2").close();
+    refreshLessons()
   };
 
   return (
@@ -34,10 +49,17 @@ const LessonDialog = () => {
 
           <div className="modal-action flex justify-end gap-2">
             <form method="dialog">
-              <button className="btn btn-outline">Cancel</button>
+              <button className="btn btn-outline" disabled={loading}>Cancel</button>
             </form>
             <button type="submit" className="btn btn-primary text-white">
-              Create Lesson by Agent
+              {loading ? (
+                <div className="flex items-center justify-center gap-1">
+                  <Bot className="h-6 w-6 text-white animate-bounce" />
+                  <p>creating...</p>
+                </div>
+              ) : (
+                "Create Lesson by Agent"
+              )}
             </button>
           </div>
         </form>

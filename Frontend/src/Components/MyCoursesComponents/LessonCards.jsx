@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router";
 
-const LessonCards = ({ lesson }) => {
+const LessonCards = ({ lesson ,Loading}) => {
   const stripMarkdown = (text) => {
     return text
       .replace(/[#_*~`>]/g, "")
@@ -12,6 +12,7 @@ const LessonCards = ({ lesson }) => {
   const handleLessonView = () => {
     navigate(`/lesson/${lesson.course._id}/${lesson._id}`);
   };
+  if (Loading) <span className="loading loading-dots loading-lg"></span>
 
   return (
     <div className="card bg-base-200 text-white shadow-md">

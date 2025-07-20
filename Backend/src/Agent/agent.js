@@ -1,4 +1,4 @@
-// llm.js
+// // llm.js
 import axios from "axios";
 import "dotenv/config";
 
@@ -11,7 +11,7 @@ const callAgent = async (prompt) => {
       { role: "system", content: "You are a helpful and creative assistant agent." },
       { role: "user", content: prompt },
     ],
-    max_tokens: 700,
+    max_tokens: 2048,
     temperature: 0.9,
     top_p: 0.95,
     stop: null,
@@ -37,3 +37,36 @@ const callAgent = async (prompt) => {
 };
 
 export default callAgent;
+
+
+
+
+// llm.js
+// import axios from "axios";
+// import "dotenv/config";
+
+// const callAgent = async (prompt) => {
+//   const hfApiKey = process.env.HUGGINGFACE_API_KEY;
+
+//   try {
+//     const res = await axios.post(
+//       "https://api-inference.huggingface.co/models/google/flan-t5-base",
+//       {
+//         inputs: prompt,  // Hugging Face expects a plain text input
+//       },
+//       {
+//         headers: {
+//           Authorization: `Bearer ${hfApiKey}`,
+//         },
+//       }
+//     );
+
+//     // Some models return an array of generated text
+//     return res.data[0]?.generated_text || "No result";
+//   } catch (error) {
+//     console.error("HuggingFace LLM Error:", error.response?.data || error.message);
+//     return "Sorry, I couldn't process your request.";
+//   }
+// };
+
+// export default callAgent;

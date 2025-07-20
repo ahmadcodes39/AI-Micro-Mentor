@@ -1,8 +1,8 @@
 import api from "../lib/axiosInstance";
 
-export const generateInitialLessonsByAgent = async ({ topic, courseId }) => {
+export const generateInitialLessonsByAgent = async (topic, courseId ) => {
   const response = await api.post(
-    `/lesson/${courseId}`,
+    `/lesson/initial-lesson/${courseId}`,
     { topic },
     { withCredentials: true }
   );
@@ -46,3 +46,22 @@ export const getIndividualLesson = async ({ courseId, lessonId }) => {
     throw new Error("generate lesson error", error?.response?.message);
   }
 };
+
+export const addLesson = async ( courseId, topic, courseName ) => {
+  try {
+    //   console.log("Before calling API ID ",courseId)
+    // console.log("Before calling API Course Name ",courseName)
+    // console.log("Before calling API lesson Title ",topic)
+    const response = await api.post(
+      `/lesson/${courseId}`,
+      { topic, courseName },
+      { withCredentials: true }
+    );
+    return response.data;
+  } catch (error) {
+    throw new Error(
+      `Backend Error in creating lesson: ${error?.response?.data?.message || error.message}`
+    );
+  }
+};
+

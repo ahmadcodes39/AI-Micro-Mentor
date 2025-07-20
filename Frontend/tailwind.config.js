@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 import daisyui from 'daisyui';
+import tailwindTypography from '@tailwindcss/typography'
 
 const config = {
   content: [
@@ -9,7 +10,10 @@ const config = {
   theme: {
     extend: {},
   },
-  plugins: [daisyui],
+ plugins: [
+  daisyui,
+ tailwindTypography,
+],
   daisyui: {
     themes: [
       "light",

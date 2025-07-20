@@ -19,7 +19,6 @@ const courseSchema = new mongoose.Schema(
     },
     slug: {
       type: String,
-      unique: true,
       lowercase: true,
       trim: true,
     },
@@ -54,3 +53,4 @@ courseSchema.pre("validate", function (next) {
 
 const Course = mongoose.model("Course", courseSchema);
 export default Course;
+ 

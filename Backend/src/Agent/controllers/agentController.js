@@ -5,25 +5,53 @@ import Course from "../../models/courseModal.js";
 import { extractLinks } from "../../utils/helperFunctions.js";
 import {
   createFlashCardsPrompt,
+  createInitialLessonPrompt,
   createLessonPrompt,
   createQuizPrompt,
 } from "../../utils/Prompts/agentPrompts.js";
 
-export const createLessonsByAgent = async ({ topic }) => {
-  console.log("Lesson topic ",topic)
-  const prompt = createLessonPrompt({topic});
-  console.log(`AI prompt ${prompt}`)
+export const createLessonsByAgent = async ({ topic, courseName }) => {
+  console.log("Lesson topic", topic);
+
+  const prompt = createLessonPrompt({ topic, courseName });
+  console.log(`AI prompt ${prompt}`);
+
   let aiResponse = await callAgent(prompt);
   aiResponse = aiResponse.replace(/<think>[\s\S]*?<\/think>/gi, "").trim();
 
-  const [titleLine, ...restContent] = aiResponse.split("\n");
-  const title = titleLine.replace(/[^a-zA-Z0-9 ]/g, "").trim();
-  const content = restContent.join("\n").trim();
+  // ✅ Title extraction (both cases)
+  let title = "Untitled Lesson";
+  let titleMatch = aiResponse.match(/^#\s*(.+)$/m); // Case 1: Markdown heading
+
+  if (!titleMatch) {
+    titleMatch = aiResponse.match(/(?:\*\*|###+)?\s*Title[:：]?\s*(.+)/i); // Case 2: Labeled title
+  }
+
+  if (titleMatch) {
+    title = titleMatch[1].replace(/[*_`#-]/g, "").trim();
+  }
+
+  // ✅ Content: remove title line only, keep rest including Resources & Time
+  const content = aiResponse
+    .replace(/^#\s*.+$/m, "") // Remove Markdown title
+    .replace(/(?:\*\*|###+)?\s*Title[:：]?.+$/im, "") // Remove labeled title if present
+    .trim();
+
+  // ✅ Extract resource links (optional: leave as is if `extractLinks` works well)
   const resources = extractLinks(aiResponse);
+
+  // ✅ Extract duration
   let duration = 5;
-  const timeMatch = aiResponse.match(/(\d+)\s*(minutes|min)\b/i);               
+  const timeMatch = aiResponse.match(/##\s*Estimated Time to Complete[\s\S]*?(\d+)\s*(minutes|min)/i);
   if (timeMatch) {
     duration = parseInt(timeMatch[1]);
+  }
+
+  // ✅ Extract tags (still stripping this from the response)
+  let tags = [];
+  const tagsMatch = aiResponse.match(/##\s*Tags\s*\n(.+)/i);
+  if (tagsMatch) {
+    tags = tagsMatch[1].split(",").map((tag) => tag.trim().toLowerCase());
   }
 
   const slug = slugify(title, { lower: true });
@@ -34,10 +62,69 @@ export const createLessonsByAgent = async ({ topic }) => {
     content,
     duration,
     resources,
-    tags: [topic.toLowerCase()],
+    tags,
     aiResponse,
   };
 };
+
+
+
+export const createInitialLessonsByAgent = async ({ topic }) => {
+  const prompt = createInitialLessonPrompt({ topic });
+  let aiResponse = await callAgent(prompt);
+  aiResponse = aiResponse.replace(/<think>[\s\S]*?<\/think>/gi, "").trim();
+
+  // ✅ Title extraction (Markdown heading or label style)
+  let title = "Untitled Lesson";
+  let titleMatch = aiResponse.match(/^#\s*(.+)$/m); // Case 1: "# Title"
+
+  if (!titleMatch) {
+    titleMatch = aiResponse.match(/(?:\*\*|###+)?\s*Title[:：]?\s*(.+)/i); // Case 2: "**Title:** ..."
+  }
+
+  if (titleMatch) {
+    title = titleMatch[1].replace(/[*_`#-]/g, "").trim();
+  }
+
+  // ✅ Content: remove only title + tags section (keep Resources + Time)
+  const content = aiResponse
+    .replace(/^#\s*.+$/m, "") // Remove Markdown title
+    .replace(/(?:\*\*|###+)?\s*Title[:：]?.+$/im, "") // Remove labeled title
+    .replace(/##\s*Tags\s*\n.+/i, "") // Remove tags section o
+    .trim();
+
+  // ✅ Extract resource links
+  const resources = extractLinks(aiResponse);
+
+  // ✅ Extract duration (from "Estimated Time to Complete" section)
+  let duration = 5;
+  const timeMatch = aiResponse.match(
+    /##\s*Estimated Time to Complete[\s\S]*?(\d+)\s*(minutes|min)/i
+  );
+  if (timeMatch) {
+    duration = parseInt(timeMatch[1]);
+  }
+
+  // ✅ Extract tags
+  let tags = [];
+  const tagsMatch = aiResponse.match(/##\s*Tags\s*\n(.+)/i);
+  if (tagsMatch) {
+    tags = tagsMatch[1].split(",").map((tag) => tag.trim().toLowerCase());
+  }
+
+  const slug = slugify(title, { lower: true });
+
+  return {
+    title,
+    slug,
+    content,
+    duration,
+    resources,
+    tags,
+    aiResponse,
+  };
+};
+
 
 export const createFlashCardsByAgent = async ({
   topic,
@@ -93,7 +180,7 @@ export const createQuizByAgent = async ({
       /Question:\s*(.+?)\s*A\.\s*(.+?)\s*B\.\s*(.+?)\s*C\.\s*(.+?)\s*D\.\s*(.+?)\s*Answer:\s*([ABCD])\s*Explanation:\s*(.+?)(?=\nQuestion:|\n*$)/gs;
 
     const quizQuestions = [];
-    
+
     let match;
 
     while ((match = questionPattern.exec(aiResponse)) !== null) {
@@ -136,4 +223,3 @@ export const createQuizByAgent = async ({
     throw new Error("Failed to generate quiz");
   }
 };
-

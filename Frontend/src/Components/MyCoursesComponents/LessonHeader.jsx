@@ -2,7 +2,7 @@ import { Plus } from "lucide-react";
 import React from "react";
 import LessonDialog from "../Modal/LessonDialog";
 
-const LessonHeader = ({ name, category }) => {
+const LessonHeader = ({ name, category,refreshLessons }) => {
   const openDialog = () => {
     document.getElementById("my_modal_2").showModal();
   };
@@ -25,7 +25,7 @@ const LessonHeader = ({ name, category }) => {
       </button>
 
       {/* Dialog */}
-      <LessonDialog />
+      <LessonDialog refreshLessons={refreshLessons}/>
     </div>
   );
 };

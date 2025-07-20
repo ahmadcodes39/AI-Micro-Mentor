@@ -36,7 +36,7 @@ export const registerUser = async (req, res) => {
 
     const userObj = user.toObject();
     delete userObj.password;
-
+    // console.log("user avatar frmo register function ",userObj.avatar)
     return res.status(201).json({
       message: "User registered successfully",
       user: userObj,
@@ -68,6 +68,7 @@ export const loginUser = async (req, res) => {
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
   const userObj = findUser.toObject();
+  // console.log("user avatar from backend",userObj.avatar)
   delete userObj.password;
   return res
     .status(200)

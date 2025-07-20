@@ -1,7 +1,7 @@
 import Lesson from "../models/lessonsModal.js";
 import User from "../models/userModal.js";
 import Course from "../models/courseModal.js";
-import { createLessonsByAgent } from "../Agent/controllers/agentController.js";
+import { createInitialLessonsByAgent, createLessonsByAgent } from "../Agent/controllers/agentController.js";
 import slugify from "slugify";
 
 export const getAllLessons = async (req, res) => {
@@ -28,16 +28,68 @@ export const getAllLessons = async (req, res) => {
 export const createLesson = async (req, res) => {
   try {
     const { courseId } = req.params;
-    const { topic } = req.body;
+    const { topic, courseName } = req.body;
     const userId = req?.user?._id;
+    console.log("From backend ID ", courseId);
+    console.log("From backend Course Name ", courseName);
+    console.log("From backend lesson Title ", topic);
 
-    if (!topic || !courseId) {
-      return res
-        .status(400)
-        .json({ message: "Both topic and courseId is required" });
+    if (!topic || !courseId || !courseName) {
+      return res.status(400).json({
+        message: "Both topic, courseId, and courseName are required",
+      });
     }
     const { title, content, duration, resources, tags, aiResponse } =
-      await createLessonsByAgent({ topic });
+      await createLessonsByAgent({ topic, courseName });
+    // Generate base slug
+    let baseSlug = slugify(title || "untitled", { lower: true });
+    let slug = baseSlug;
+    let counter = 1;
+
+    // Ensure slug is unique in the Lesson collection
+    while (await Lesson.findOne({ slug })) {
+      slug = `${baseSlug}-${counter++}`;
+    }
+    const new_lesson = await Lesson.create({
+      createdBy: userId,
+      course: courseId,
+      title,
+      slug,
+      content,
+      duration,
+      resources,
+      tags,
+    });
+    await Course.findByIdAndUpdate(courseId, {
+      $push: { lessons: new_lesson._id },
+    });
+
+    return res.status(201).json({
+      message: "Lesson created by agent successfully",
+      lesson: new_lesson,
+      aiResponse,
+    });
+  } catch (error) {
+    console.error("Lesson Agent Error:", error.message);
+    return res.status(500).json({ message: "Lesson By agent not created" });
+  }
+};
+
+export const createInitialLesson = async (req, res) => {
+  try {
+    const { courseId } = req.params;
+    const { topic } = req.body;
+    const userId = req?.user?._id;
+    console.log("Initial Lesson ID ", courseId);
+    console.log("Initial Lesson lesson Title ", topic);
+
+    if (!topic || !courseId) {
+      return res.status(400).json({
+        message: "Both topic, courseId are required",
+      });
+    }
+    const { title, content, duration, resources, tags, aiResponse } =
+      await createInitialLessonsByAgent({ topic });
     // Generate base slug
     let baseSlug = slugify(title || "untitled", { lower: true });
     let slug = baseSlug;
@@ -101,7 +153,7 @@ export const deleteLesson = async (req, res) => {
     console.error("Error deleting lesson:", error);
     return res.status(500).json({ message: "Failed to delete lesson" });
   }
-}; 
+};
 
 export const getIndividualLesson = async (req, res) => {
   try {
@@ -111,7 +163,10 @@ export const getIndividualLesson = async (req, res) => {
         .status(400)
         .json({ message: "Lesson ID and Course ID are required" });
     }
-    const lesson = await Lesson.findOne({ course: courseId, _id: lessonId });
+    const lesson = await Lesson.findOne({
+      course: courseId,
+      _id: lessonId,
+    }).populate("course", "name");
     if (!lesson) {
       return res.status(404).json({ message: "Lesson not found" });
     }
