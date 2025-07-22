@@ -51,7 +51,8 @@ export const registerUser = async (req, res) => {
 };
 
 export const loginUser = async (req, res) => {
-  const { email, password } = req.body;
+ try {
+   const { email, password } = req.body;
   const findUser = await User.findOne({ email }).select("+password");
   if (!findUser)
     return res.status(400).json({ message: "Invalid email or password" });
@@ -73,6 +74,9 @@ export const loginUser = async (req, res) => {
   return res
     .status(200)
     .json({ message: "User logged in successfully", userObj });
+ } catch (error) {
+   return res.status(500).json({ message: "User not logged in" });
+ }
 };
 
 export const logoutUser = async (req, res) => {

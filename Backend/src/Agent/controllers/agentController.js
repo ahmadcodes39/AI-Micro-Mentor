@@ -156,7 +156,7 @@ export const createFlashCardsByAgent = async ({
         });
       }
     }
-
+    console.log("Ai rresponse for the flashcards ",aiResponse)
     return flashcards;
   } catch (error) {
     console.error("Flashcard Agent Error:", error.message);

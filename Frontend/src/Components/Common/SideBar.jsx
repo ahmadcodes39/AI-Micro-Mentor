@@ -22,7 +22,7 @@ import { AuthContext } from "../Context/authContext";
 const SideBar = () => {
   const { currentUser,setCurrentUser } = useContext(AuthContext);
   const navigate = useNavigate();
-  const [isClose, setIsClose] = useState(false);
+  const [isClose, setIsClose] = useState(true);
   const [imageError, setImageError] = useState(false);
   const navigations = [
     { name: "Home", link: "/dashboard", icon: <Home size={20} /> },

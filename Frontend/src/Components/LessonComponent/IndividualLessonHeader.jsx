@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React from "react";
 import { Book, Clock, Tag } from "lucide-react";
 import moment from "moment";
-
+import { useNavigate, useParams, useLocation } from "react-router-dom"; 
 const IndividualLessonHeader = ({
   title,
   courseName,
@@ -9,17 +9,32 @@ const IndividualLessonHeader = ({
   tags,
   createdAt,
 }) => {
-  const [activeTab, setActiveTab] = useState("Tab 1");
+  const { courseId, lessonId } = useParams();
+  const navigate = useNavigate();
+  const location = useLocation(); 
+
+  const path = location.pathname;
+  let activeTab = "Lesson";
+  if (path.includes("/quiz")) activeTab = "Quiz";
+  else if (path.includes("/flashcards")) activeTab = "Flash Cards";
+
+  const handleTabClick = (tab) => {
+    if (tab === "Lesson") {
+      navigate(`/lesson/${courseId}/${lessonId}`);
+    } else if (tab === "Quiz") {
+      navigate(`/quiz/${courseId}/${lessonId}`);
+    } else if (tab === "Flash Cards") {
+      navigate(`/flashcards/${courseId}/${lessonId}`);
+    }
+  };
 
   return (
     <div className="bg-base-200 p-6 rounded-lg shadow-md space-y-4">
-      {/* Title */}
       <div className="flex items-center gap-2 text-2xl font-bold text-base-content">
-        <Book className="w-6 h-6 text-primary" />
+        <Book className="w-6 h-6 text-primary md:flex hidden" />
         {title}
       </div>
 
-      {/* Metadata */}
       <div className="flex flex-wrap gap-4 text-sm text-gray-400">
         <span>
           <strong>Course:</strong> {courseName}
@@ -33,9 +48,7 @@ const IndividualLessonHeader = ({
         </span>
       </div>
 
-      {/* Tags + Tabs Row */}
       <div className="flex justify-between items-center flex-wrap gap-4">
-        {/* Tags */}
         <div className="flex flex-wrap gap-2">
           {tags.map((tag, i) => (
             <span
@@ -48,15 +61,14 @@ const IndividualLessonHeader = ({
           ))}
         </div>
 
-        {/* Tabs */}
         <div className="pt-2">
-          <div role="tablist" className="tabs tabs-boxed border-gray-400 border-2">
-            {["Tab 1", "Tab 2", "Tab 3"].map((tab) => (
+          <div role="tablist" className="tabs tabs-boxed bg-base-300">
+            {["Lesson", "Quiz", "Flash Cards"].map((tab) => (
               <button
                 key={tab}
                 role="tab"
                 className={`tab ${activeTab === tab ? "tab-active" : ""}`}
-                onClick={() => setActiveTab(tab)}
+                onClick={() => handleTabClick(tab)}
               >
                 {tab}
               </button>

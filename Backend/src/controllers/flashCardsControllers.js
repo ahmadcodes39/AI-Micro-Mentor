@@ -29,7 +29,7 @@ export const generateFlashCards = async (req, res) => {
 
     return res.status(201).json({
       message: "Flashcards generated successfully",
-      flashCards: createdCards,
+      cards: createdCards,
     });
   } catch (error) {
     console.error("Error generating flashcards:", error.message);
@@ -41,17 +41,17 @@ export const generateFlashCards = async (req, res) => {
 
 export const getAllFlashCards = async (req, res) => {
   try {
-    const { courseID, lessonID } = req.params;
+    const { courseId, lessonId } = req.params;
     const userId = req?.user?._id;
 
-    if (!userId || !courseID || !lessonID) {
+    if (!userId || !courseId || !lessonId) {
       return res.status(400).json({ message: "Missing required fields" });
     }
 
     const getCards = await FlashCards.find({
       createdBy: userId,
-      course: courseID,
-      lesson: lessonID,
+      course: courseId,
+      lesson: lessonId,
     });
 
     if (!getCards.length) {

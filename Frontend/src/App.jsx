@@ -11,6 +11,8 @@ import AppLayout from "./Components/Layout/AppLayout";
 import { getCurrentUser } from "./Components/API/authApi";
 import { AuthContext } from "./Components/Context/authContext";
 import LessonDetailPage from "./Pages/LessonDetailPage";
+import FlashCardsPage from "./Pages/FlashCardsPage";
+import QuizPage from "./Pages/QuizPage";
 
 const App = () => {
   const [loading, setLoading] = useState(true);
@@ -86,6 +88,22 @@ const App = () => {
             element={
               <AppLayout showSideBar={true}>
                 {isAuthenticated ? <LessonDetailPage /> : <Navigate to={"/"} />}
+              </AppLayout>
+            }
+          />
+          <Route
+            path="/flashcards/:courseId/:lessonId"
+            element={
+              <AppLayout showSideBar={true}>
+                {isAuthenticated ? <FlashCardsPage /> : <Navigate to={"/"} />}
+              </AppLayout>
+            }
+          />
+          <Route
+            path="/quiz/:courseId/:lessonId"
+            element={
+              <AppLayout showSideBar={true}>
+                {isAuthenticated ? <QuizPage /> : <Navigate to={"/"} />}
               </AppLayout>
             }
           />

@@ -6,12 +6,10 @@ import { motion } from "framer-motion";
 const IndividualLessonDetails = ({ content }) => {
   return (
     <div className="flex flex-col gap-4 mt-6 overflow-hidden">
-      {/* Markdown content */}
       <div className="prose prose-sm md:prose-base lg:prose-lg max-w-none text-base-content leading-relaxed pb-4">
         <ReactMarkdown>{content}</ReactMarkdown>
       </div>
 
-      {/* Delete button aligned to the right */}
       <div className="flex justify-end pb-5 mr-4">
         <div className="flex items-center gap-2">
           <motion.button

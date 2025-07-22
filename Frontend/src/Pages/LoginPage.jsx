@@ -35,7 +35,6 @@ const LoginPage = () => {
         toast.success(response.message)
         console.log("Logging in with", response.userObj);
         setCurrentUser(response.userObj)
-
       }
       else{
         toast.error(response.message)

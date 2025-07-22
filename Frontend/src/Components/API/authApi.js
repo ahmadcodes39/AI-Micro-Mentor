@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 import api from "../lib/axiosInstance";
 
 export const loginUser = async ({ email, password }) => {
@@ -13,8 +14,9 @@ export const loginUser = async ({ email, password }) => {
     } else {
       throw new Error("Unexpected response from server.");
     }
-  } catch (error) {
-    console.error("Login error:", error.response?.data || error.message);
+  }  catch (error) {
+    toast.error(error?.response?.data?.message || "Login failed");
+    return null; // 👈 important
   }
 };
 
