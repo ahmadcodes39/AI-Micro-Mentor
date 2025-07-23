@@ -1,27 +1,29 @@
-import React, { useState } from "react";
-import { Sparkles, Bot } from "lucide-react";
+import { Bot, Sparkles } from "lucide-react";
+import React from "react";
 import { useEffect } from "react";
+import { useState } from "react";
 
-const FlashCardDialog = ({ content, generateUserFlashCard }) => {
+const QuizDialog = ({ content, generateQuiz }) => {
   const [topic, setTopic] = useState(content);
   const [loading, setLoading] = useState(false);
+
   useEffect(() => {
     setTopic(content);
   }, [content]);
+
   const handleGenerate = async () => {
     setLoading(true);
-    await generateUserFlashCard(topic);
+    await generateQuiz(topic);
     setLoading(false);
-    document.getElementById("flashCard").close();
+    document.getElementById("quiz_modal").close();
   };
-
   return (
     <div>
-      <dialog id="flashCard" className="modal">
+      <dialog id="quiz_modal" className="modal">
         <div className="modal-box bg-base-100 text-white max-w-3xl overflow-y-auto">
           <h3 className="font-bold text-lg mb-4">
             <Sparkles className="inline mr-2 text-primary" />
-            Generate Flashcards for:{" "}
+            Generate Quiz for:
             <span className="text-accent">{content}</span>
           </h3>
 
@@ -49,7 +51,7 @@ const FlashCardDialog = ({ content, generateUserFlashCard }) => {
             ) : (
               <>
                 <Sparkles />
-                Generate Flashcards
+                Generate Quiz
               </>
             )}
           </button>
@@ -64,4 +66,4 @@ const FlashCardDialog = ({ content, generateUserFlashCard }) => {
   );
 };
 
-export default FlashCardDialog;
+export default QuizDialog;

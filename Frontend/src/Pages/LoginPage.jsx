@@ -9,8 +9,9 @@ const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState({});
-  const {setCurrentUser} = useContext(AuthContext)
+  const { setCurrentUser } = useContext(AuthContext);
   const togglePassword = () => setShowPassword(!showPassword);
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -19,6 +20,7 @@ const LoginPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     const newErrors = {};
     if (!formData.email) newErrors.email = "Email is required";
     if (!formData.password) {
@@ -32,12 +34,12 @@ const LoginPage = () => {
     if (Object.keys(newErrors).length === 0) {
       const response = await loginUser(formData);
       if (response) {
-        toast.success(response.message)
+        toast.success(response.message);
         console.log("Logging in with", response.userObj);
-        setCurrentUser(response.userObj)
-      }
-      else{
-        toast.error(response.message)
+        setCurrentUser(response.userObj);
+        setLoading(false);
+      } else {
+        toast.error(response.message);
       }
     }
   };
@@ -110,7 +112,13 @@ const LoginPage = () => {
           </div>
 
           <button type="submit" className="btn btn-primary w-full mt-2">
-            Sign in <MoveRight className="size-5" />
+            {loading ? (
+              <span className="loading loading-spinner text-secondary"></span>
+            ) : (
+              <>
+                Sign in <MoveRight className="size-5" />
+              </>
+            )}
           </button>
         </form>
 

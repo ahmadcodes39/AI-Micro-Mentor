@@ -7,6 +7,10 @@ const quizSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    title:{
+      type:String,
+      required: true,
+    },
     course: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Course",

@@ -24,13 +24,13 @@ app.use(cors({
   methods: ["GET", "PUT", "POST", "DELETE", "PATCH"],
   credentials: true               
 }));
-
+     
 
 app.use("/api/auth", authRoutes);
 app.use("/api/courses", courseRoutes);
-app.use("/api/lesson", lessonRoutes);
+app.use("/api/lesson", lessonRoutes);                                                        
 app.use('/api/flashCards',flashCardRoutes)
-app.use('/api/quiz',quizRoutes)
+app.use('/api/quiz',quizRoutes)      
  
 const port = process.env.PORT || 5000;
 

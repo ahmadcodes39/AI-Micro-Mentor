@@ -13,6 +13,7 @@ import { AuthContext } from "./Components/Context/authContext";
 import LessonDetailPage from "./Pages/LessonDetailPage";
 import FlashCardsPage from "./Pages/FlashCardsPage";
 import QuizPage from "./Pages/QuizPage";
+import SettingPage from "./Pages/SettingPage";
 
 const App = () => {
   const [loading, setLoading] = useState(true);
@@ -104,6 +105,14 @@ const App = () => {
             element={
               <AppLayout showSideBar={true}>
                 {isAuthenticated ? <QuizPage /> : <Navigate to={"/"} />}
+              </AppLayout>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <AppLayout showSideBar={true}>
+                {isAuthenticated ? <SettingPage /> : <Navigate to={"/"} />}
               </AppLayout>
             }
           />

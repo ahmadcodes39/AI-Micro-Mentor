@@ -19,7 +19,6 @@ export const createLessonsByAgent = async ({ topic, courseName }) => {
   let aiResponse = await callAgent(prompt);
   aiResponse = aiResponse.replace(/<think>[\s\S]*?<\/think>/gi, "").trim();
 
-  // ✅ Title extraction (both cases)
   let title = "Untitled Lesson";
   let titleMatch = aiResponse.match(/^#\s*(.+)$/m); // Case 1: Markdown heading
 
@@ -42,7 +41,9 @@ export const createLessonsByAgent = async ({ topic, courseName }) => {
 
   // ✅ Extract duration
   let duration = 5;
-  const timeMatch = aiResponse.match(/##\s*Estimated Time to Complete[\s\S]*?(\d+)\s*(minutes|min)/i);
+  const timeMatch = aiResponse.match(
+    /##\s*Estimated Time to Complete[\s\S]*?(\d+)\s*(minutes|min)/i
+  );
   if (timeMatch) {
     duration = parseInt(timeMatch[1]);
   }
@@ -66,8 +67,6 @@ export const createLessonsByAgent = async ({ topic, courseName }) => {
     aiResponse,
   };
 };
-
-
 
 export const createInitialLessonsByAgent = async ({ topic }) => {
   const prompt = createInitialLessonPrompt({ topic });
@@ -125,7 +124,6 @@ export const createInitialLessonsByAgent = async ({ topic }) => {
   };
 };
 
-
 export const createFlashCardsByAgent = async ({
   topic,
   userId,
@@ -156,7 +154,7 @@ export const createFlashCardsByAgent = async ({
         });
       }
     }
-    console.log("Ai rresponse for the flashcards ",aiResponse)
+    console.log("Ai rresponse for the flashcards ", aiResponse);
     return flashcards;
   } catch (error) {
     console.error("Flashcard Agent Error:", error.message);
@@ -173,12 +171,14 @@ export const createQuizByAgent = async ({
   try {
     const prompt = createQuizPrompt({ topic });
     let aiResponse = await callAgent(prompt);
-
+    const titleMatch = aiResponse.match(/Title:\s*(.+)/i);
+    const quizTitle = titleMatch ? titleMatch[1].trim() : "Untitled Quiz";
     aiResponse = aiResponse.replace(/<think>[\s\S]*?<\/think>/gi, "").trim();
 
     const questionPattern =
       /Question:\s*(.+?)\s*A\.\s*(.+?)\s*B\.\s*(.+?)\s*C\.\s*(.+?)\s*D\.\s*(.+?)\s*Answer:\s*([ABCD])\s*Explanation:\s*(.+?)(?=\nQuestion:|\n*$)/gs;
 
+      console.log("ai response for the quiz ", aiResponse)
     const quizQuestions = [];
 
     let match;
@@ -210,6 +210,7 @@ export const createQuizByAgent = async ({
         createdBy: userId,
         course: courseID,
         lesson: lessonID,
+        title:quizTitle,
         question: question.trim(),
         options,
         answer: correctAnswer,

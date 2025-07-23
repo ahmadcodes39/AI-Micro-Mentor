@@ -124,11 +124,11 @@ Now generate the flashcards.
 
 export const createQuizPrompt = ({ topic }) => {
   const promptVariants = [
-    `Create a multiple-choice quiz with exact 10 questions on the topic: "${topic}".`,
-    `Design a beginner-level quiz consisting of exactly 10 MCQs about "${topic}".`,
-    `Prepare a quiz of esactly 10 multiple-choice questions for beginners learning "${topic}".`,
-    `Generate exactly 10 MCQ-style quiz questions about "${topic}" with explanations.`,
-    `You're a helpful tutor. Create exactly 10-question MCQ quiz on "${topic}" with 4 options and a brief explanation for each correct answer.`,
+    `Create a multiple-choice quiz with exactly 10 questions on the topic: "${topic}". Also provide a suitable title for the quiz.`,
+    `Design a beginner-level quiz of exactly 10 MCQs about "${topic}" and give it a title.`,
+    `Prepare a quiz of exactly 10 multiple-choice questions for beginners learning "${topic}", and add a quiz title.`,
+    `Generate exactly 10 MCQ-style quiz questions about "${topic}" with explanations, and start with a title for the quiz.`,
+    `You're a helpful tutor. Create a 10-question MCQ quiz on "${topic}" with 4 options and a short explanation per question. Include a quiz title.`,
   ];
 
   const selectedPrompt =
@@ -137,6 +137,9 @@ export const createQuizPrompt = ({ topic }) => {
   const now = new Date().getTime();
 
   return `${selectedPrompt}
+
+Start your response with:
+Title: [Your quiz title]
 
 Each question must follow this format:
 
@@ -149,6 +152,7 @@ Answer: [Correct option letter]
 Explanation: [Brief explanation why this option is correct]
 
 ✅ Requirements:
+- One quiz title at the top
 - Exactly 10 questions
 - 4 distinct options (A to D) for each
 - Only **one correct answer per question**
@@ -156,14 +160,6 @@ Explanation: [Brief explanation why this option is correct]
 - Keep it simple and beginner-friendly
 - Avoid markdown or special formatting
 
-Example:
-Question: What does HTML stand for?
-A. Hyper Tool Markup Language  
-B. Hyperlinks and Text Markup Language  
-C. Hyper Text Markup Language  
-D. Home Text Machine Language  
-Answer: C  
-Explanation: HTML stands for Hyper Text Markup Language and is used to structure content on the web.
-
 (seed:${now})`;
 };
+

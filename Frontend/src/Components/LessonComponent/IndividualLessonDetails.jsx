@@ -1,4 +1,4 @@
-import { Trash2Icon } from "lucide-react";
+import { BadgeCheck, Trash2Icon } from "lucide-react";
 import React from "react";
 import ReactMarkdown from "react-markdown";
 import { motion } from "framer-motion";
@@ -10,8 +10,16 @@ const IndividualLessonDetails = ({ content }) => {
         <ReactMarkdown>{content}</ReactMarkdown>
       </div>
 
-      <div className="flex justify-end pb-5 mr-4">
+      <div className="flex justify-end pb-5 mr-4 gap-4">
         <div className="flex items-center gap-2">
+          <motion.button
+            whileHover={{ scale: 1.1,y:-4 }}
+            whileTap={{ scale: 0.95 }}
+            className="btn btn-sm text-white btn-success flex items-center gap-1"
+          >
+            <BadgeCheck  className="size-4" />
+            Marked Done
+          </motion.button>
           <motion.button
             whileHover={{ scale: 1.1,y:-4 }}
             whileTap={{ scale: 0.95 }}
@@ -20,6 +28,7 @@ const IndividualLessonDetails = ({ content }) => {
             <Trash2Icon className="size-4" />
             Delete Lesson
           </motion.button>
+          
         </div>
       </div>
     </div>

@@ -4,6 +4,7 @@ import FlashCards from "../Components/FlashCardsComponent/FlashCards";
 import FlashCardDialog from "../Components/Modal/FlashCardDialog";
 import { useParams } from "react-router";
 import {
+  deleteFlashCard,
   generateInitialFlashCards,
   getUserFlashCards,
 } from "../Components/API/flashCardsApi";
@@ -15,6 +16,7 @@ const FlashCardsPage = () => {
   const [flashCards, setFlashCards] = useState([]);
   const [loading, setLoading] = useState(true);
   const { courseId, lessonId } = useParams();
+  const [cardTopic, setCardTopic] = useState("");
 
   useEffect(() => {
     if (!lessonContent) return;
@@ -22,9 +24,7 @@ const FlashCardsPage = () => {
     const getFlashCards = async () => {
       try {
         setLoading(true);
-
         const response = await getUserFlashCards(courseId, lessonId);
-        console.log("response from component ", response.cards);
         if (!response.cards || response.cards.length === 0) {
           const generated = await generateInitialFlashCards(
             courseId,
@@ -48,16 +48,54 @@ const FlashCardsPage = () => {
     getFlashCards();
   }, [lessonContent, courseId, lessonId]);
 
+  const generateUserFlashCard = async (topic) => {
+    if (topic == null || topic == "") {
+      topic = cardTopic;
+    }
+    const generated = await generateInitialFlashCards(
+      courseId,
+      lessonId,
+      topic
+    );
+    if (generated) {
+      setFlashCards(generated.cards);
+      toast.success(generated.message);
+    } else {
+      toast.error(generated.message);
+    }
+    const response = await getUserFlashCards(courseId, lessonId);
+    if (response) {
+      setFlashCards(response.cards);
+    }
+  };
   const handleGenerateClick = () => {
     document.getElementById("flashCard").showModal();
+    console.log(
+      "lesson content and title " + lessonContent + "title is here " + cardTopic
+    );
   };
-  console.log("flash cards from component ",flashCards)
+  // console.log("flash cards from component ",lessonContent)
+
+  const handleLessonContent = (lesson) => {
+    setLessonContent(lesson);
+    setCardTopic(lesson?.title);
+
+    // console.log("Lesson received:", lesson);
+  };
+  const handleDeleteCard = async (id) => {
+    console.log("id to delete " + id)
+    const response = await deleteFlashCard(id);
+    if (response) {
+      setFlashCards((prev) => prev.filter((card) => card._id !== id));
+      toast.success(response.message);
+    } else {
+      toast.error(response?.message || "Failed to delete flashcard");
+    }
+  };
 
   return (
     <div>
-      <LessonTopBar
-        onLessonLoaded={(lesson) => setLessonContent(lesson.content)}
-      />
+      <LessonTopBar onLessonLoaded={handleLessonContent} />
 
       {loading ? (
         <div className="flex flex-col items-center justify-center gap-3 p-8 bg-base-200 rounded-lg shadow mt-6">
@@ -79,13 +117,19 @@ const FlashCardsPage = () => {
 
           <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-2 mt-4 ">
             {flashCards.map((card, index) => (
-              <FlashCards key={index} flashCards={card} />
+              <FlashCards
+                key={index}
+                flashCards={card}
+                onDelete={() => handleDeleteCard(card?._id)}
+              />
             ))}
           </div>
         </div>
       )}
-
-      <FlashCardDialog content={lessonContent} />
+      <FlashCardDialog
+        generateUserFlashCard={generateUserFlashCard}
+        content={cardTopic}
+      />
     </div>
   );
 };

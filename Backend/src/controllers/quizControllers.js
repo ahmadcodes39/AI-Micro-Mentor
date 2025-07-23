@@ -1,7 +1,8 @@
 import { createQuizByAgent } from "../Agent/controllers/agentController.js";
+import Lesson from "../models/lessonsModal.js";
 import Progress from "../models/progressSchema.js";
 import Quiz from "../models/quizModals.js";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 
 export const generateQuiz = async (req, res) => {
   try {
@@ -14,7 +15,7 @@ export const generateQuiz = async (req, res) => {
         .status(400)
         .json({ message: "Missing topic, courseID or lessonId" });
     }
-    const quizSessionId = uuidv4()
+    const quizSessionId = uuidv4();
 
     const generatedQuiz = await createQuizByAgent({
       topic,
@@ -23,15 +24,16 @@ export const generateQuiz = async (req, res) => {
       courseID,
     });
 
-    const quizWithSession = generatedQuiz.map(q=>({
+    const quizWithSession = generatedQuiz.map((q) => ({
       ...q,
       quizSessionId,
-    }))
+    }));
     if (!quizWithSession.length) {
-       return res.status(400).json({ message: "No Quiz generated" });
+      return res.status(400).json({ message: "No Quiz generated" });
     }
-
+    console.log("quiz befre saving ", quizWithSession);
     const saveQuiz = await Quiz.insertMany(quizWithSession);
+    console.log("quiz After saving ", saveQuiz);
     return res.status(201).json({
       message: "Quiz generated successfully",
       quiz: saveQuiz,
@@ -48,7 +50,9 @@ export const submitQuiz = async (req, res) => {
     const userId = req?.user?._id;
 
     if (!quizSessionId || !answers || !Array.isArray(answers)) {
-      return res.status(400).json({ message: "quizSessionId and answers are required" });
+      return res
+        .status(400)
+        .json({ message: "quizSessionId and answers are required" });
     }
 
     const quizQuestions = await Quiz.find({ quizSessionId, createdBy: userId });
@@ -57,7 +61,7 @@ export const submitQuiz = async (req, res) => {
     const result = [];
 
     for (const { questionId, selectedAnswer } of answers) {
-      const q = quizQuestions.find(q => q._id.toString() === questionId);
+      const q = quizQuestions.find((q) => q._id.toString() === questionId);
 
       if (q) {
         const isCorrect = q.answer === selectedAnswer;
@@ -92,7 +96,6 @@ export const submitQuiz = async (req, res) => {
         completed: true,
         completionDate: new Date(),
         quizScore: scoreCount,
-        
       },
       { upsert: true, new: true }
     );
@@ -109,7 +112,6 @@ export const submitQuiz = async (req, res) => {
     return res.status(500).json({ message: "Server error submitting quiz" });
   }
 };
- 
 
 export const quizHistory = async (req, res) => {
   try {
@@ -121,7 +123,10 @@ export const quizHistory = async (req, res) => {
 
     // Get all quiz questions created by the user
     const quizzes = await Quiz.find({ createdBy: userId })
-      .select("question answer options explanation createdAt updatedAt lesson course quizSessionId")
+      .select(
+        "title question answer options explanation createdAt updatedAt lesson course quizSessionId"
+      )
+      .populate("")
       .sort({ createdAt: -1 });
 
     // Get all progress records of this user
@@ -142,11 +147,12 @@ export const quizHistory = async (req, res) => {
       if (!acc[sessionId]) {
         acc[sessionId] = {
           quizSessionId: sessionId,
+          title: quiz.title,
           course: quiz.course,
           lesson: quiz.lesson,
           createdAt: quiz.createdAt,
           score: sessionIdToScoreMap.get(sessionId) || null,
-          questions: []
+          questions: [],
         };
       }
 
@@ -157,7 +163,7 @@ export const quizHistory = async (req, res) => {
         options: quiz.options,
         explanation: quiz.explanation,
         createdAt: quiz.createdAt,
-        updatedAt: quiz.updatedAt
+        updatedAt: quiz.updatedAt,
       });
 
       return acc;
@@ -168,11 +174,80 @@ export const quizHistory = async (req, res) => {
     return res.status(200).json({
       message: "User quiz history fetched successfully",
       totalSessions: history.length,
-      history
+      history,
     });
-
   } catch (error) {
     console.error("Quiz History Error:", error.message);
-    return res.status(500).json({ message: "Server error fetching quiz history" });
+    return res
+      .status(500)
+      .json({ message: "Server error fetching quiz history" });
   }
 };
+
+export const getQuizForSpecificLesson = async (req, res) => {
+  const { courseId, lessonId } = req.params;
+  const userId = req.user_id;
+
+  try {
+    // Step 1: Find all quiz questions for the given course and lesson
+    const allQuestions = await Quiz.find({
+      course: courseId,
+      lesson: lessonId,
+    });
+
+    // Step 2: Group questions by quizSessionId
+    const groupedQuizzes = {};
+    for (const q of allQuestions) {
+      if (!groupedQuizzes[q.quizSessionId]) {
+        groupedQuizzes[q.quizSessionId] = {
+          quizSessionId: q.quizSessionId,
+          title: q.title,
+          course: q.course,
+          lesson: q.lesson,
+          createdBy: q.createdBy,
+          createdAt: q.createdAt,
+          updatedAt: q.updatedAt,
+          questions: [],
+        };
+      }
+
+      groupedQuizzes[q.quizSessionId].questions.push({
+        _id: q._id,
+        question: q.question,
+        options: q.options,
+        answer: q.answer,
+        explanation: q.explanation,
+      });
+    }
+
+    // Step 3: Add progress info for each quiz session
+    const quizzesWithProgress = await Promise.all(
+      Object.values(groupedQuizzes).map(async (quizGroup) => {
+        // Find any progress entry for this quizSession
+        const anyQuestionId = quizGroup.questions[0]._id;
+        const progress = await Progress.findOne({
+          createdBy: userId,
+          lesson: lessonId,
+          quiz: anyQuestionId, // Assuming at least one question represents the quiz session
+        });             
+
+        return {
+          ...quizGroup,
+          completed: progress?.completed || false,
+          completionDate: progress?.completionDate || null,
+          quizScore: progress?.quizScore || null,
+        };
+      })
+    );
+
+    res.status(200).json({
+      message: "Grouped quizzes with progress fetched successfully",
+      totalQuizzes: quizzesWithProgress.length,
+      quiz: quizzesWithProgress,
+    });
+  } catch (error) {
+    console.error("Error fetching grouped quizzes:", error.message);
+    res.status(500).json({ message: "Server error while fetching quizzes" });
+  }
+};
+

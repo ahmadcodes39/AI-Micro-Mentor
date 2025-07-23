@@ -7,6 +7,7 @@ import { AuthContext } from "../Components/Context/authContext";
 
 const SignUpPage = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     firstname: "",
     lastname: "",
@@ -15,7 +16,7 @@ const SignUpPage = () => {
     goals: "",
   });
   const [errors, setErrors] = useState({});
-  const {setCurrentUser} = useContext(AuthContext)
+  const { setCurrentUser } = useContext(AuthContext);
   const togglePassword = () => setShowPassword(!showPassword);
 
   const handleChange = (e) => {
@@ -25,6 +26,7 @@ const SignUpPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     const newErrors = {};
     if (!formData.firstname) newErrors.firstname = "First name is required";
     if (!formData.lastname) newErrors.lastname = "Last name is required";
@@ -39,11 +41,12 @@ const SignUpPage = () => {
     setErrors(newErrors);
 
     if (Object.keys(newErrors).length === 0) {
-      const response = await signUpUser(formData)
+      const response = await signUpUser(formData);
       if (response) {
-        toast.success(response.message)
-        console.log("Sign up data ",response)
-        setCurrentUser(response.user)
+        toast.success(response.message);
+        console.log("Sign up data ", response);
+        setCurrentUser(response.user);
+        setLoading(false);
       }
     }
   };
@@ -187,7 +190,13 @@ const SignUpPage = () => {
           </div>
 
           <button type="submit" className="btn btn-primary w-full mt-2">
-            Sign Up <MoveRight className="size-5" />
+            {loading ? (
+              <span className="loading loading-spinner text-secondary"></span>
+            ) : (
+              <>
+                "Sign Up" <MoveRight className="size-5" />
+              </>
+            )}
           </button>
         </form>
 
