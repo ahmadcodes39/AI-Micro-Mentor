@@ -12,10 +12,15 @@ const progressSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Lesson",
     },
-    quiz:{
-      type:mongoose.Schema.Types.ObjectId,
-      ref:"Quiz",
+    quiz: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Quiz",
     },
+    quizSessionId: {
+      type: String,
+      required: true,
+    },
+
     completed: {
       type: Boolean,
       default: false,
@@ -35,5 +40,5 @@ const progressSchema = new mongoose.Schema(
   }
 );
 
-const Progress =  mongoose.model("Progress", progressSchema);
-export default Progress
+const Progress = mongoose.model("Progress", progressSchema);
+export default Progress;

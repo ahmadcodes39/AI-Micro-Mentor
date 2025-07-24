@@ -33,7 +33,46 @@ export const getAllQuizes = async () => {
 
 export const getSpecificQuiz = async (courseId, lessonId) => {
   try {
-    const response = await api.get(`/quiz/get-quiz/${courseId}/${lessonId}`, { withCredentials: true });
+    const response = await api.get(`/quiz/get-quiz/${courseId}/${lessonId}`, {
+      withCredentials: true,
+    });
+    if (response && response.data) {
+      return response.data;
+    } else {
+      throw new Error("Unexpected error from server " + response.message);
+    }
+  } catch (error) {
+    throw new Error("Server error " + error);
+  }
+};
+
+export const getSingleQuiz = async (quizId) => {
+  try {
+    const response = await api.get(`/quiz/single-quiz/${quizId}`, {
+      withCredentials: true,
+    });
+    if (response && response.data) {
+      return response.data;
+    } else {
+      throw new Error("Unexpected error from server " + response.message);
+    }
+  } catch (error) {
+    throw new Error("Server error " + error);
+  }
+};
+
+export const submitQuiz = async (
+  quizSessionId,
+  answers,
+  courseID,
+  lessonID
+) => {
+  try {
+    const response = await api.post(
+      `/quiz/submit-quiz/${courseID}/${lessonID}`,
+      { quizSessionId, answers },
+      { withCredentials: true }
+    );
     if (response && response.data) {
       return response.data;
     } else {

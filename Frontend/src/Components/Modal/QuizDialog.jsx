@@ -3,7 +3,7 @@ import React from "react";
 import { useEffect } from "react";
 import { useState } from "react";
 
-const QuizDialog = ({ content, generateQuiz }) => {
+const QuizDialog = ({ content, generateQuiz,getQuizData }) => {
   const [topic, setTopic] = useState(content);
   const [loading, setLoading] = useState(false);
 
@@ -16,6 +16,7 @@ const QuizDialog = ({ content, generateQuiz }) => {
     await generateQuiz(topic);
     setLoading(false);
     document.getElementById("quiz_modal").close();
+    getQuizData()
   };
   return (
     <div>

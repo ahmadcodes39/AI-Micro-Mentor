@@ -14,6 +14,7 @@ import LessonDetailPage from "./Pages/LessonDetailPage";
 import FlashCardsPage from "./Pages/FlashCardsPage";
 import QuizPage from "./Pages/QuizPage";
 import SettingPage from "./Pages/SettingPage";
+import QuizDetailPage from "./Pages/QuizDetailPage";
 
 const App = () => {
   const [loading, setLoading] = useState(true);
@@ -113,6 +114,14 @@ const App = () => {
             element={
               <AppLayout showSideBar={true}>
                 {isAuthenticated ? <SettingPage /> : <Navigate to={"/"} />}
+              </AppLayout>
+            }
+          />
+          <Route
+            path="/test/:courseId/:lessonId/:quizId"
+            element={
+              <AppLayout showSideBar={true}>
+                {isAuthenticated ? <QuizDetailPage /> : <Navigate to={"/"} />}
               </AppLayout>
             }
           />

@@ -25,8 +25,7 @@ const QuizPage = () => {
     console.log("lesson content for quiz", lessonContent);
   }, [lessonContent]);
 
-  useEffect(() => {
-    const getQuizData = async () => {
+  const getQuizData = async () => {
       try {
         setLoading(true);
         const response = await getSpecificQuiz(courseId, lessonId);
@@ -35,7 +34,6 @@ const QuizPage = () => {
         if (response?.quiz) {
           setQuizData(response.quiz);
           setTotalQuizes(response.totalQuizzes);
-          toast.success(response.message);
         } else {
           toast.error(response.message || "Error in fetching user quizzes");
         }
@@ -47,6 +45,8 @@ const QuizPage = () => {
       }
     };
 
+  useEffect(() => {
+  
     getQuizData();
   }, []);
 
@@ -58,7 +58,6 @@ const QuizPage = () => {
   try {
     const response = await generateQuiz(courseId, lessonId, topic);
     if (response) {
-      toast.success(response.message);
       setQuizData((prev) => [...prev, response.quiz]);
       setTotalQuizes((prev) => prev + 1);
       document.getElementById("quiz_modal").close();
@@ -70,7 +69,6 @@ const QuizPage = () => {
     toast.error("Something went wrong!");
   }
 };
-
   console.log("quiz data", quizData);
   return (
     <div>
@@ -112,6 +110,7 @@ const QuizPage = () => {
       <QuizDialog
         content={lessonContent?.title}
         generateQuiz={handleGenerateQuiz}
+        getQuizData={getQuizData}
       />
     </div>
   );

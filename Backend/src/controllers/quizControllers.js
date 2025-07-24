@@ -31,9 +31,7 @@ export const generateQuiz = async (req, res) => {
     if (!quizWithSession.length) {
       return res.status(400).json({ message: "No Quiz generated" });
     }
-    console.log("quiz befre saving ", quizWithSession);
     const saveQuiz = await Quiz.insertMany(quizWithSession);
-    console.log("quiz After saving ", saveQuiz);
     return res.status(201).json({
       message: "Quiz generated successfully",
       quiz: saveQuiz,
@@ -49,13 +47,25 @@ export const submitQuiz = async (req, res) => {
     const { quizSessionId, answers } = req.body;
     const userId = req?.user?._id;
 
+    // Validate required fields
     if (!quizSessionId || !answers || !Array.isArray(answers)) {
       return res
         .status(400)
         .json({ message: "quizSessionId and answers are required" });
     }
 
-    const quizQuestions = await Quiz.find({ quizSessionId, createdBy: userId });
+    // Fetch all quiz questions belonging to this session and user
+    const quizQuestions = await Quiz.find({
+      quizSessionId,
+      createdBy: userId,
+    });
+
+    // If no questions found
+    if (!quizQuestions || quizQuestions.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "Quiz questions not found for this session" });
+    }
 
     let scoreCount = 0;
     const result = [];
@@ -84,21 +94,31 @@ export const submitQuiz = async (req, res) => {
       }
     }
 
-    // Use the first question to determine lesson & course
+    // Use the first question to determine lesson, course, and quiz
     const sampleQ = quizQuestions[0];
 
-    await Progress.findOneAndUpdate(
-      { createdBy: userId, lesson: sampleQ.lesson, quiz: sampleQ._id },
+    // ✅ FIX: Include all required fields in upsert (even if document doesn't exist)
+   const updatedProgress =  await Progress.findOneAndUpdate(
+      {
+        createdBy: userId,
+        lesson: sampleQ.lesson,
+        quizSessionId: quizSessionId,
+      },
       {
         createdBy: userId,
         lesson: sampleQ.lesson,
         quiz: sampleQ._id,
+        quizSessionId: quizSessionId,
         completed: true,
         completionDate: new Date(),
         quizScore: scoreCount,
       },
-      { upsert: true, new: true }
+      {
+        upsert: true,
+        new: true,
+      }
     );
+
 
     return res.status(200).json({
       message: "Quiz submitted successfully",
@@ -110,6 +130,69 @@ export const submitQuiz = async (req, res) => {
   } catch (error) {
     console.error("Quiz submission error:", error.message);
     return res.status(500).json({ message: "Server error submitting quiz" });
+  }
+};
+
+
+export const getQuizForSpecificLesson = async (req, res) => {
+  const { courseId, lessonId } = req.params;
+  const userId = req.user._id;
+
+  try {
+    // Step 1: Find all quiz questions for the given course and lesson
+    const allQuestions = await Quiz.find({
+      course: courseId, 
+      lesson: lessonId,          
+    });
+    // Step 2: Group questions by quizSessionId
+    const groupedQuizzes = {};
+    for (const q of allQuestions) {
+      if (!groupedQuizzes[q.quizSessionId]) {   
+        groupedQuizzes[q.quizSessionId] = {
+          quizSessionId: q.quizSessionId,
+          title: q.title,
+          course: q.course,
+          lesson: q.lesson,
+          createdBy: q.createdBy,
+          createdAt: q.createdAt,
+          updatedAt: q.updatedAt,
+          questions: [],
+        };
+      }
+
+      groupedQuizzes[q.quizSessionId].questions.push({
+        _id: q._id,
+        question: q.question,
+        options: q.options,
+        answer: q.answer,
+        explanation: q.explanation,
+      });
+    }
+
+    // Step 3: Add progress info for each quiz session (based on quizSessionId now)
+    const quizzesWithProgress = await Promise.all(
+      Object.values(groupedQuizzes).map(async (quizGroup) => {
+        const progress = await Progress.findOne({
+          createdBy: userId,
+          lesson: lessonId,
+          quizSessionId: quizGroup.quizSessionId, 
+        });
+        return {
+          ...quizGroup,
+          completed: progress?.completed || false,
+          completionDate: progress?.completionDate || null,
+          quizScore: progress?.quizScore || null,
+        };
+      })
+    );
+
+    res.status(200).json({
+      message: "Grouped quizzes with progress fetched successfully",
+      totalQuizzes: quizzesWithProgress.length,
+      quiz: quizzesWithProgress,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Server error while fetching quizzes" });
   }
 };
 
@@ -184,70 +267,18 @@ export const quizHistory = async (req, res) => {
   }
 };
 
-export const getQuizForSpecificLesson = async (req, res) => {
-  const { courseId, lessonId } = req.params;
-  const userId = req.user_id;
+export const getSingleQuiz = async (req, res) => {
+  const { quizId } = req.params;
 
   try {
-    // Step 1: Find all quiz questions for the given course and lesson
-    const allQuestions = await Quiz.find({
-      course: courseId,
-      lesson: lessonId,
-    });
-
-    // Step 2: Group questions by quizSessionId
-    const groupedQuizzes = {};
-    for (const q of allQuestions) {
-      if (!groupedQuizzes[q.quizSessionId]) {
-        groupedQuizzes[q.quizSessionId] = {
-          quizSessionId: q.quizSessionId,
-          title: q.title,
-          course: q.course,
-          lesson: q.lesson,
-          createdBy: q.createdBy,
-          createdAt: q.createdAt,
-          updatedAt: q.updatedAt,
-          questions: [],
-        };
-      }
-
-      groupedQuizzes[q.quizSessionId].questions.push({
-        _id: q._id,
-        question: q.question,
-        options: q.options,
-        answer: q.answer,
-        explanation: q.explanation,
-      });
-    }
-
-    // Step 3: Add progress info for each quiz session
-    const quizzesWithProgress = await Promise.all(
-      Object.values(groupedQuizzes).map(async (quizGroup) => {
-        // Find any progress entry for this quizSession
-        const anyQuestionId = quizGroup.questions[0]._id;
-        const progress = await Progress.findOne({
-          createdBy: userId,
-          lesson: lessonId,
-          quiz: anyQuestionId, // Assuming at least one question represents the quiz session
-        });             
-
-        return {
-          ...quizGroup,
-          completed: progress?.completed || false,
-          completionDate: progress?.completionDate || null,
-          quizScore: progress?.quizScore || null,
-        };
-      })
+    const desiredQuiz = await Quiz.find({ quizSessionId: quizId }).populate(
+      "title"
     );
-
-    res.status(200).json({
-      message: "Grouped quizzes with progress fetched successfully",
-      totalQuizzes: quizzesWithProgress.length,
-      quiz: quizzesWithProgress,
-    });
+    if (!desiredQuiz) {
+      return res.status(400).json({ message: "No such Quiz found" });
+    }
+    return res.status(200).json({ message: "Quiz found", quiz: desiredQuiz });
   } catch (error) {
-    console.error("Error fetching grouped quizzes:", error.message);
-    res.status(500).json({ message: "Server error while fetching quizzes" });
+    return res.status(500).json({ message: "Internal server error" + error });
   }
 };
-
