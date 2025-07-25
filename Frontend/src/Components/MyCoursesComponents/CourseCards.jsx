@@ -6,8 +6,8 @@ import NoCoursesFound from "./NoCourseFound";
 const CourseCards = ({ courses = [], loading }) => {
   const navigate = useNavigate();
 
-  const handleViewCourse = (id,slug) => {
-    navigate(`/course/${id}/${slug}`);
+  const handleViewCourse = (id,topic) => {
+    navigate(`/course/${id}`,{state:topic});
   };
 
   if (loading) {
@@ -21,6 +21,7 @@ const CourseCards = ({ courses = [], loading }) => {
   if (courses.length === 0) {
     return <NoCoursesFound />;
   }
+  console.log(courses)
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
@@ -52,7 +53,7 @@ const CourseCards = ({ courses = [], loading }) => {
             <div className="card-actions justify-end mt-4">
               <button
                 className="btn btn-sm btn-outline btn-primary"
-                onClick={() => handleViewCourse(course._id, course.slug)}
+                onClick={() => handleViewCourse(course._id,course.category)}
               >
                 <Eye className="w-4 h-4" /> View
               </button>

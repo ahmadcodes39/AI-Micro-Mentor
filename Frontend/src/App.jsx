@@ -15,6 +15,7 @@ import FlashCardsPage from "./Pages/FlashCardsPage";
 import QuizPage from "./Pages/QuizPage";
 import SettingPage from "./Pages/SettingPage";
 import QuizDetailPage from "./Pages/QuizDetailPage";
+import ResultPage from "./Pages/ResultPage";
 
 const App = () => {
   const [loading, setLoading] = useState(true);
@@ -29,7 +30,6 @@ const App = () => {
     getUser();
   }, []);
   const isAuthenticated = Boolean(currentUser?._id);
-  console.log("current user ", currentUser);
   if (loading) {
     return (
       <div className="flex justify-center items-center h-48">
@@ -69,7 +69,7 @@ const App = () => {
             }
           />
           <Route
-            path="/course/:courseId/:topic"
+            path="/course/:courseId"
             element={
               <AppLayout showSideBar={true}>
                 {isAuthenticated ? <CourseDetailPage /> : <Navigate to={"/"} />}
@@ -120,8 +120,16 @@ const App = () => {
           <Route
             path="/test/:courseId/:lessonId/:quizId"
             element={
-              <AppLayout showSideBar={true}>
+              <AppLayout showSideBar={false}>
                 {isAuthenticated ? <QuizDetailPage /> : <Navigate to={"/"} />}
+              </AppLayout>
+            }
+          />
+          <Route
+            path="/result/:courseId/:lessonId"
+            element={
+              <AppLayout showSideBar={false}>
+                {isAuthenticated ? <ResultPage /> : <Navigate to={"/"} replace={true}/>}
               </AppLayout>
             }
           />

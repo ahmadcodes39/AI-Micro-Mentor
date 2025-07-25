@@ -1,6 +1,8 @@
 import Course from "../models/courseModal.js";
-import Lesson from "../models/lessonsModal.js";
 import Progress from "../models/progressSchema.js";
+import Quiz from "../models/quizModals.js";
+import Lesson from "../models/lessonsModal.js";
+import FlashCard from '../models/flashCardsModal.js'
 
 export const getAllCourses = async (req, res) => {
   try {
@@ -10,15 +12,20 @@ export const getAllCourses = async (req, res) => {
 
     const coursesWithDetails = await Promise.all(
       courses.map(async (course) => {
-        const totalLessons = await Lesson.countDocuments({ course: course._id });
-
-        const completedLessons = await Progress.countDocuments({
-          createdBy: userId,
+        const totalLessons = await Lesson.countDocuments({
           course: course._id,
-          completed: true
         });
 
-        const progress = totalLessons === 0 ? 0 : Math.round((completedLessons / totalLessons) * 100);
+        const completedLessons = await Lesson.countDocuments({
+          createdBy: userId,
+          course: course._id,
+          completionDate: { $exists: true, $ne: null },
+        });
+
+        const progress =
+          totalLessons === 0
+            ? 0
+            : Math.round((completedLessons / totalLessons) * 100);
 
         return {
           ...course,
@@ -39,19 +46,22 @@ export const getAllCourses = async (req, res) => {
   }
 };
 
-
 export const getSpecificCourse = async (req, res) => {
   try {
     const { slug } = req.params;
 
     const desiredCourse = await Course.findOne({ slug }).populate("lessons");
-    const totalLessons = await Lesson.countDocuments({course:desiredCourse._id})
+    const totalLessons = await Lesson.countDocuments({
+      course: desiredCourse._id,
+    });
 
     if (!desiredCourse) {
       return res.status(404).json({ message: "Course not found" });
     }
 
-    return res.status(200).json({ message: "Course found",totalLessons, course: desiredCourse });
+    return res
+      .status(200)
+      .json({ message: "Course found", totalLessons, course: desiredCourse });
   } catch (error) {
     console.error("Error fetching desired course:", error);
     return res.status(500).json({ message: "Server error" });
@@ -70,7 +80,7 @@ export const createCourse = async (req, res) => {
     });
     return res.status(200).json({
       message: "New course created successfully",
-      new_course 
+      new_course,
     });
   } catch (error) {
     console.error("Error creating course:", error);
@@ -82,12 +92,23 @@ export const deleteCourse = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const getCourse = await Course.findByIdAndDelete(id);
-    if (!getCourse) {
+    const lessons = await Lesson.find({ course: id });
+
+    const lessonIds = lessons.map((lesson) => lesson._id);
+
+    await Quiz.deleteMany({ course: id, lesson: { $in: lessonIds } });
+    await FlashCard.deleteMany({ course: id, lesson: { $in: lessonIds } });
+
+    await Lesson.deleteMany({ course: id });
+
+    const deletedCourse = await Course.findByIdAndDelete(id);
+    if (!deletedCourse) {
       return res.status(404).json({ message: "Course not found" });
     }
 
-    return res.status(200).json({ message: "Course deleted successfully" });
+    return res
+      .status(200)
+      .json({ message: "Course and all related data deleted successfully" });
   } catch (error) {
     console.error("Error deleting course:", error);
     return res.status(500).json({ message: "Server error" });
@@ -97,7 +118,7 @@ export const deleteCourse = async (req, res) => {
 export const updateCourse = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, description,category } = req.body;
+    const { name, description, category } = req.body;
 
     const updatedCourse = await Course.findByIdAndUpdate(
       id,
@@ -118,6 +139,3 @@ export const updateCourse = async (req, res) => {
     return res.status(500).json({ message: "Server error" });
   }
 };
-
-
-

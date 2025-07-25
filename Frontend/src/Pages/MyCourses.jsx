@@ -24,6 +24,7 @@ const MyCourses = () => {
       setLoading(false); 
     }
   };
+  console.log("course data",courses)
 
   useEffect(() => {
     fetchCourses();

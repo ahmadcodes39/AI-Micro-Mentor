@@ -20,17 +20,13 @@ const FlashCardsPage = () => {
 
   useEffect(() => {
     if (!lessonContent) return;
-
     const getFlashCards = async () => {
       try {
         setLoading(true);
         const response = await getUserFlashCards(courseId, lessonId);
         if (!response.cards || response.cards.length === 0) {
-          const generated = await generateInitialFlashCards(
-            courseId,
-            lessonId,
-            lessonContent
-          );
+         const generated = await generateInitialFlashCards(courseId, lessonId, lessonContent?.content);
+
           if (generated) {
             setFlashCards(generated.cards);
             toast.success("Flashcards generated successfully");
@@ -70,20 +66,14 @@ const FlashCardsPage = () => {
   };
   const handleGenerateClick = () => {
     document.getElementById("flashCard").showModal();
-    console.log(
-      "lesson content and title " + lessonContent + "title is here " + cardTopic
-    );
   };
-  // console.log("flash cards from component ",lessonContent)
 
   const handleLessonContent = (lesson) => {
     setLessonContent(lesson);
     setCardTopic(lesson?.title);
 
-    // console.log("Lesson received:", lesson);
   };
   const handleDeleteCard = async (id) => {
-    console.log("id to delete " + id)
     const response = await deleteFlashCard(id);
     if (response) {
       setFlashCards((prev) => prev.filter((card) => card._id !== id));

@@ -25,7 +25,7 @@ const LessonHeader = ({ name, category,refreshLessons }) => {
       </button>
 
       {/* Dialog */}
-      <LessonDialog refreshLessons={refreshLessons}/>
+      <LessonDialog refreshLessons={refreshLessons} name={name}/>
     </div>
   );
 };

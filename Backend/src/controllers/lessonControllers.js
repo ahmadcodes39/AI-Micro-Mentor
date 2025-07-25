@@ -1,7 +1,13 @@
 import Lesson from "../models/lessonsModal.js";
 import User from "../models/userModal.js";
 import Course from "../models/courseModal.js";
-import { createInitialLessonsByAgent, createLessonsByAgent } from "../Agent/controllers/agentController.js";
+import Quiz from "../models/quizModals.js";
+import FlashCards from "../models/flashCardsModal.js";
+
+import {
+  createInitialLessonsByAgent,
+  createLessonsByAgent,
+} from "../Agent/controllers/agentController.js";
 import slugify from "slugify";
 
 export const getAllLessons = async (req, res) => {
@@ -10,7 +16,7 @@ export const getAllLessons = async (req, res) => {
     const lessons = await Lesson.find({
       course: courseId,
       createdBy: req.user._id,
-    }).populate("course", "name");
+    }).populate("course", "name").sort(({createdAt:-1}));
 
     if (!lessons || lessons.length === 0) {
       return res
@@ -30,9 +36,7 @@ export const createLesson = async (req, res) => {
     const { courseId } = req.params;
     const { topic, courseName } = req.body;
     const userId = req?.user?._id;
-    console.log("From backend ID ", courseId);
-    console.log("From backend Course Name ", courseName);
-    console.log("From backend lesson Title ", topic);
+   
 
     if (!topic || !courseId || !courseName) {
       return res.status(400).json({
@@ -142,6 +146,9 @@ export const deleteLesson = async (req, res) => {
         .json({ message: "Lesson not found or unauthorized" });
     }
 
+    await Quiz.deleteMany({ course: courseId, lesson: lessonId });
+    await FlashCards.deleteMany({ course: courseId, lesson: lessonId });
+
     await Lesson.findByIdAndDelete(lessonId);
 
     await Course.findByIdAndUpdate(courseId, {
@@ -174,5 +181,25 @@ export const getIndividualLesson = async (req, res) => {
   } catch (error) {
     console.error("Error fetching individual lesson:", error);
     return res.status(500).json({ message: "Failed to get lesson" });
+  }
+};
+
+export const updateLesson = async (req, res) => {
+  const { courseId, lessonId } = req.params;
+
+  try {
+    const updatedLesson = await Lesson.findOneAndUpdate(
+      { _id: lessonId, course: courseId },
+      { $set: { completionDate: new Date() } },
+      { new: true }
+    );
+
+    if (!updatedLesson) {
+      return res.status(404).json({ message: "Lesson not found" });
+    }
+
+    res.status(200).json({ message: "Lesson updated", lesson: updatedLesson });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };

@@ -4,10 +4,11 @@ import { useParams } from "react-router";
 import toast from "react-hot-toast";
 import { Bot } from "lucide-react";
 
-const LessonDialog = ({refreshLessons}) => {
+const LessonDialog = ({refreshLessons,name}) => {
   const [lessonTitle, setLessonTitle] = useState("");
   const [loading, setLoading] = useState(false);
-  const { courseId, topic:courseName } = useParams();
+  const { courseId } = useParams();
+  const courseName = name
   
 
   const handleCreate = async (e) => {

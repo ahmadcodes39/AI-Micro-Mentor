@@ -22,14 +22,14 @@ const QuizPage = () => {
     setLessonContent(lesson);
   };
   useEffect(() => {
-    console.log("lesson content for quiz", lessonContent);
+    // console.log("lesson content for quiz", lessonContent);
   }, [lessonContent]);
 
   const getQuizData = async () => {
       try {
         setLoading(true);
         const response = await getSpecificQuiz(courseId, lessonId);
-        console.log("response data ", response);
+        // console.log("response data ", response);
         setQuizData(response?.quiz);
         if (response?.quiz) {
           setQuizData(response.quiz);

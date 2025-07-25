@@ -1,18 +1,18 @@
+import { CircleCheckBig } from "lucide-react";
 import React from "react";
 import { useNavigate, useParams } from "react-router";
 
 const QuizCard = ({ quiz }) => {
-  const {courseId,lessonId} = useParams()
+  const { courseId, lessonId } = useParams();
   const totalQuestions = quiz?.questions?.length || 0;
-  const optionsPerQuestion =
-    quiz?.questions?.[0]?.options?.length || "N/A";
+  const optionsPerQuestion = quiz?.questions?.[0]?.options?.length || "N/A";
   const score = quiz?.quizScore ?? 0;
   const completed = quiz?.completed ?? false;
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
-  const handleQuiz = ()=>{
-    navigate(`/test/${courseId}/${lessonId}/${quiz?.quizSessionId}`)
-  }
+  const handleQuiz = () => {
+    navigate(`/test/${courseId}/${lessonId}/${quiz?.quizSessionId}`);
+  };
 
   return (
     <div className="card bg-base-100 shadow-xl border border-base-300 hover:shadow-2xl transition duration-300 ease-in-out relative">
@@ -61,7 +61,13 @@ const QuizCard = ({ quiz }) => {
         </div>
 
         <div className="card-actions absolute bottom-4 right-2">
-          <button className="btn btn-primary btn-sm"onClick={handleQuiz}>{completed?"View Details":"Take Quiz"}</button>
+          {completed ? (
+            <CircleCheckBig className="text-accent size-7" />
+          ) : (
+            <button className="btn btn-primary btn-sm" onClick={handleQuiz}>
+              Take Quiz
+            </button>
+          )}
         </div>
       </div>
     </div>

@@ -3,7 +3,13 @@ import React from "react";
 import ReactMarkdown from "react-markdown";
 import { motion } from "framer-motion";
 
-const IndividualLessonDetails = ({ content }) => {
+const IndividualLessonDetails = ({
+  content,
+  handleDoneLesson,
+  isComplete,
+  handleDeleteLesson,
+  isDelete,
+}) => {
   return (
     <div className="flex flex-col gap-4 mt-6 overflow-hidden">
       <div className="prose prose-sm md:prose-base lg:prose-lg max-w-none text-base-content leading-relaxed pb-4">
@@ -13,22 +19,32 @@ const IndividualLessonDetails = ({ content }) => {
       <div className="flex justify-end pb-5 mr-4 gap-4">
         <div className="flex items-center gap-2">
           <motion.button
-            whileHover={{ scale: 1.1,y:-4 }}
+            whileHover={{ scale: 1.1, y: -4 }}
             whileTap={{ scale: 0.95 }}
-            className="btn btn-sm text-white btn-success flex items-center gap-1"
+            className={`btn btn-sm text-white btn-success flex items-center gap-1 
+    ${isComplete ? "opacity-60 cursor-not-allowed" : ""}`}
+            onClick={!isComplete ? handleDoneLesson : undefined}
           >
-            <BadgeCheck  className="size-4" />
-            Marked Done
+            <BadgeCheck className="size-4" />
+            {isComplete ? "Completed" : "Mark Done"}
           </motion.button>
+
           <motion.button
-            whileHover={{ scale: 1.1,y:-4 }}
+            whileHover={{ scale: 1.1, y: -4 }}
             whileTap={{ scale: 0.95 }}
             className="btn btn-sm text-white btn-error flex items-center gap-1"
+            onClick={handleDeleteLesson}
           >
             <Trash2Icon className="size-4" />
-            Delete Lesson
+            {isDelete ? (
+              <>
+                Deleting
+                <span className="loading loading-spinner text-white"></span>
+              </>
+            ) : (
+              "Delete Lesson"
+            )}
           </motion.button>
-          
         </div>
       </div>
     </div>

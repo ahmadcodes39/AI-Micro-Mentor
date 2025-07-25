@@ -32,12 +32,12 @@ const lessonSchema = new mongoose.Schema(
     },
 
     duration: {
-      type: Number, 
+      type: Number,
       default: 5,
     },
 
     resources: {
-      type: [String], 
+      type: [String],
       default: [],
     },
 
@@ -45,13 +45,14 @@ const lessonSchema = new mongoose.Schema(
       type: [String],
       default: [],
     },
-
+    completionDate: {
+      type: Date,
+    },
   },
   {
     timestamps: true,
   }
 );
-
 
 lessonSchema.pre("validate", function (next) {
   if (this.name) {
@@ -60,6 +61,5 @@ lessonSchema.pre("validate", function (next) {
   next();
 });
 
-
 const Lesson = mongoose.model("Lesson", lessonSchema);
-export default Lesson
+export default Lesson;
