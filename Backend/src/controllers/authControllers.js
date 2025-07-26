@@ -7,7 +7,7 @@ import {
 import "dotenv/config";
 
 export const registerUser = async (req, res) => {
-  const { firstname, lastname, email, password,goals } = req.body;
+  const { firstname, lastname, email, password, goals } = req.body;
 
   try {
     const findUser = await User.findOne({ email });
@@ -21,7 +21,7 @@ export const registerUser = async (req, res) => {
       firstname,
       lastname,
       email,
-      learningGoal:goals,
+      learningGoal: goals,
       avatar: userAvatar,
       password: hashedPassword,
     });
@@ -50,33 +50,60 @@ export const registerUser = async (req, res) => {
   }
 };
 
+export const updatProfile = async (req, res) => {
+  const { firstname, lastname,email, goals, avatar } = req.body;
+  try {
+    const userId = req?.user?._id;
+
+    const findUser = await User.findByIdAndUpdate(userId,{
+      firstname,
+      lastname,
+      email,
+      goals,
+      avatar,
+    }, { new: true }); 
+
+    if (findUser) {
+      return res
+        .status(200)
+        .json({ message: "Profile Updated Successfully", user: findUser });
+    }
+  } catch (error) {
+    return res.status(500).json({
+  message: "Server Error",
+  error: error?.message || "Unknown error",
+});
+
+  }
+};
+
 export const loginUser = async (req, res) => {
- try {
-   const { email, password } = req.body;
-  const findUser = await User.findOne({ email }).select("+password");
-  if (!findUser)
-    return res.status(400).json({ message: "Invalid email or password" });
+  try {
+    const { email, password } = req.body;
+    const findUser = await User.findOne({ email }).select("+password");
+    if (!findUser)
+      return res.status(400).json({ message: "Invalid email or password" });
 
-  const isMatch = await comparePassword(password, findUser.password);
-  if (!isMatch)
-    return res.status(400).json({ message: "Invalid email or password" });
+    const isMatch = await comparePassword(password, findUser.password);
+    if (!isMatch)
+      return res.status(400).json({ message: "Invalid email or password" });
 
-  const token = generateAuthToken(findUser);
-  res.cookie("token", token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
-    maxAge: 7 * 24 * 60 * 60 * 1000,
-  });
-  const userObj = findUser.toObject();
-  // console.log("user avatar from backend",userObj.avatar)
-  delete userObj.password;
-  return res
-    .status(200)
-    .json({ message: "User logged in successfully", userObj });
- } catch (error) {
-   return res.status(500).json({ message: "User not logged in" });
- }
+    const token = generateAuthToken(findUser);
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+    const userObj = findUser.toObject();
+    // console.log("user avatar from backend",userObj.avatar)
+    delete userObj.password;
+    return res
+      .status(200)
+      .json({ message: "User logged in successfully", userObj });
+  } catch (error) {
+    return res.status(500).json({ message: "User not logged in" });
+  }
 };
 
 export const logoutUser = async (req, res) => {
@@ -87,4 +114,3 @@ export const logoutUser = async (req, res) => {
   });
   return res.status(200).json({ message: "Logged out" });
 };
- 

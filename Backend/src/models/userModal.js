@@ -40,17 +40,8 @@ const userSchema = new mongoose.Schema(
       enum: ["user", "admin"],
       default: "user",
     },
-    onboardingCompleted: {
-      type: Boolean,
-      default: false,
-    }, 
     learningGoal: {
       type: String,
-    },
-    dailyTargetMinutes: {
-      type: Number,
-      min: [5, "Minimum daily time must be 5 minutes"],
-      max: [240, "Maximum daily time cannot exceed 240 minutes"],
     },
   },
   {

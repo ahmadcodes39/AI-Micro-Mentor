@@ -14,9 +14,9 @@ export const loginUser = async ({ email, password }) => {
     } else {
       throw new Error("Unexpected response from server.");
     }
-  }  catch (error) {
+  } catch (error) {
     toast.error(error?.response?.data?.message || "Login failed");
-    return null; // 👈 important
+    return null;
   }
 };
 
@@ -59,7 +59,11 @@ export const getCurrentUser = async () => {
 
 export const logoutUser = async () => {
   try {
-    const response = await api.post("/auth/logout", {}, { withCredentials: true });
+    const response = await api.post(
+      "/auth/logout",
+      {},
+      { withCredentials: true }
+    );
 
     if (response?.data) {
       return response.data;
@@ -68,6 +72,25 @@ export const logoutUser = async () => {
     }
   } catch (error) {
     console.error("Logout error:", error.response?.data || error.message);
-    return { message: "Logout failed" }; 
+    return { message: "Logout failed" };
+  }
+};
+
+export const updateProfile = async ( formData ) => {
+  const response = await api.patch("/auth/update-profile", formData, {
+    withCredentials: true,
+  });
+  try {
+    if (response && response.data) {
+      return response.data;
+    } else {
+      throw new Error("Unexpected response from server.", response.message);
+    }
+  } catch (error) {
+    console.error(
+      "Update profile Error:",
+      error.response?.data || error.message
+    );
+    return { message: "Update Profile Error" };
   }
 };

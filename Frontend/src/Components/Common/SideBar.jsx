@@ -31,13 +31,7 @@ const SideBar = () => {
       link: "/my-courses",
       icon: <GraduationCapIcon size={20} />,
     },
-    { name: "Lessons", link: "/lessons", icon: <BookOpenCheck size={20} /> },
-    { name: "Quizzes", link: "/quizes", icon: <ListChecks size={20} /> },
-    {
-      name: "Flash Cards",
-      link: "/flash-cards",
-      icon: <BrainCircuit size={20} />,
-    },
+    
     { name: "Settings", link: "/settings", icon: <Settings size={20} /> },
   ];
 
@@ -63,7 +57,7 @@ const SideBar = () => {
     >
       <div>
         <div className="flex items-center justify-between mb-6">
-          <div className={`flex items-center ${isClose ? "" : "gap-2"}`}>
+          <div className={`flex items-center ml-2 ${isClose ? "" : "gap-2"}`}>
             {imageError ? (
               <Aperture className={`text-primary`} />
             ) : (
@@ -82,7 +76,7 @@ const SideBar = () => {
           </div>
           <button onClick={handleToggle}>
             {isClose ? (
-              <PanelRightOpen className="text-gray-400 size-5 mr-[-9px]" />
+              <PanelRightOpen className="text-gray-400 size-5 mr-[-15px]" />
             ) : (
               <PanelRightClose className="text-gray-400 size-5" />
             )}
