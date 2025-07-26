@@ -26,10 +26,7 @@ const FlashCard = ({ flashCards,onDelete }) => {
             <h2 className="text-xl font-semibold text-center mt-2">
               {flashCards?.front}
             </h2>
-            <button className="btn btn-sm btn-accent btn-outline text-sm text-white mt-2">
-              <Eye />
-              Reveal answer
-            </button>
+           
           </div>
 
           <div className="flip-card-back bg-primary text-white p-4 rounded-lg flex flex-col items-center justify-between shadow-md overflow-hidden">
@@ -38,10 +35,7 @@ const FlashCard = ({ flashCards,onDelete }) => {
                 {flashCards?.back}
               </h2>
             </div>
-            <button className="btn btn-sm btn-outline btn-white text-white mt-2">
-              <Eye className="w-4 h-4 mr-1" />
-              Back to question
-            </button>
+           
           </div>
         </div>
       </div>

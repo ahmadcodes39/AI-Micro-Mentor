@@ -3,13 +3,13 @@ import { Eye, Pencil, Trash } from "lucide-react";
 import { useNavigate } from "react-router";
 import NoCoursesFound from "./NoCourseFound";
 
-const CourseCards = ({ courses = [], loading }) => {
+const CourseCards = ({ courses = [], loading ,handleDelete}) => {
   const navigate = useNavigate();
 
   const handleViewCourse = (id,topic) => {
     navigate(`/course/${id}`,{state:topic});
   };
-
+  
   if (loading) {
     return (
       <div className="flex justify-center items-center h-48">
@@ -21,7 +21,7 @@ const CourseCards = ({ courses = [], loading }) => {
   if (courses.length === 0) {
     return <NoCoursesFound />;
   }
-  console.log(courses)
+  // console.log(courses)
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
@@ -60,7 +60,8 @@ const CourseCards = ({ courses = [], loading }) => {
               <button className="btn btn-sm btn-outline btn-warning">
                 <Pencil className="w-4 h-4" /> Edit
               </button>
-              <button className="btn btn-sm btn-outline btn-error">
+             <button className="btn btn-sm btn-outline btn-error" onClick={() => handleDelete(course._id)}>
+
                 <Trash className="w-4 h-4" /> Delete
               </button>
             </div>

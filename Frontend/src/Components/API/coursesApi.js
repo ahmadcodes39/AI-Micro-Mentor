@@ -32,3 +32,19 @@ export const addNewCourse = async ({ name, description, category }) => {
     console.error("Error adding course " + error?.response?.message)
   }
 };
+
+export const deleteCourse = async ({ id}) => {
+  try {
+    const response = await api.delete(`/courses/${id}`,{ withCredentials: true });
+  if (response && response.data) {
+    return response.data
+  }
+  else{
+    throw new Error("Unexpected Response from server");
+  }
+  } catch (error) {
+    console.error("Error deleting course " + error?.response?.message)
+  }
+};
+
+
