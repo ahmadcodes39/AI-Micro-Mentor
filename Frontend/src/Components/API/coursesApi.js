@@ -18,33 +18,48 @@ export const getAllCourses = async () => {
 export const addNewCourse = async ({ name, description, category }) => {
   try {
     const response = await api.post(
-    "/courses",
-    { name, description, category },
-    { withCredentials: true }
-  );
-  if (response && response.data) {
-    return response.data
-  }
-  else{
-    throw new Error("Unexpected Response from server");
-  }
+      "/courses",
+      { name, description, category },
+      { withCredentials: true }
+    );
+    if (response && response.data) {
+      return response.data;
+    } else {
+      throw new Error("Unexpected Response from server");
+    }
   } catch (error) {
-    console.error("Error adding course " + error?.response?.message)
+    console.error("Error adding course " + error?.response?.message);
   }
 };
 
-export const deleteCourse = async ({ id}) => {
+export const deleteCourse = async ({ id }) => {
   try {
-    const response = await api.delete(`/courses/${id}`,{ withCredentials: true });
-  if (response && response.data) {
-    return response.data
-  }
-  else{
-    throw new Error("Unexpected Response from server");
-  }
+    const response = await api.delete(`/courses/${id}`, {
+      withCredentials: true,
+    });
+    if (response && response.data) {
+      return response.data;
+    } else {
+      throw new Error("Unexpected Response from server");
+    }
   } catch (error) {
-    console.error("Error deleting course " + error?.response?.message)
+    console.error("Error deleting course " + error?.response?.message);
   }
 };
 
+export const getUserStats = async () => {
+  try {
+    const response = await api.get("/courses/user-stats", {
+      withCredentials: true,
+    });
+    if (response && response.data) {
+      return response.data;
+    } else {
+      throw new Error("Unexpected Response from server");
+    }
+  } catch (error) {
+    console.error("Error getting stats:", error?.response?.data?.message || error.message);
+    return { error: true, message: error?.response?.data?.message || "Failed to fetch stats" };
+  }
+};
 

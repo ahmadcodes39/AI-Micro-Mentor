@@ -2,7 +2,7 @@ import Course from "../models/courseModal.js";
 import Progress from "../models/progressSchema.js";
 import Quiz from "../models/quizModals.js";
 import Lesson from "../models/lessonsModal.js";
-import FlashCard from '../models/flashCardsModal.js'
+import FlashCard from "../models/flashCardsModal.js";
 
 export const getAllCourses = async (req, res) => {
   try {
@@ -42,28 +42,6 @@ export const getAllCourses = async (req, res) => {
     });
   } catch (error) {
     console.error("Error fetching courses:", error);
-    return res.status(500).json({ message: "Server error" });
-  }
-};
-
-export const getSpecificCourse = async (req, res) => {
-  try {
-    const { slug } = req.params;
-
-    const desiredCourse = await Course.findOne({ slug }).populate("lessons");
-    const totalLessons = await Lesson.countDocuments({
-      course: desiredCourse._id,
-    });
-
-    if (!desiredCourse) {
-      return res.status(404).json({ message: "Course not found" });
-    }
-
-    return res
-      .status(200)
-      .json({ message: "Course found", totalLessons, course: desiredCourse });
-  } catch (error) {
-    console.error("Error fetching desired course:", error);
     return res.status(500).json({ message: "Server error" });
   }
 };
@@ -137,5 +115,99 @@ export const updateCourse = async (req, res) => {
   } catch (error) {
     console.error("Error updating course:", error);
     return res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const userStats = async (req, res) => {
+  const userId = req.user?._id;
+
+  try {
+    // 1. Count total number of courses created by the user
+    const totalCourses = await Course.countDocuments({ createdBy: userId });
+
+    // 2. Count total number of completed lessons
+    const lessonCompleted = await Lesson.countDocuments({
+      completionDate: { $ne: null },
+    });
+
+    // 3. Count total number of quizzes attempted by the user
+    const quizAttempted = await Progress.countDocuments({
+      createdBy: userId,
+      quiz: { $ne: null },
+      completed: true,
+    });
+
+    // 4. Count total flashcards created by the user
+    const totalFlashCards = await FlashCard.countDocuments({
+      createdBy: userId,
+    });
+
+    // 5. Get the most recently completed lesson's course
+    const recentProgress = await Progress.findOne({
+      createdBy: userId,
+      lesson: { $ne: null },
+    })
+      .sort({ completionDate: -1, updatedAt: -1 })
+      .populate({
+        path: "lesson",
+        select: "course",
+      });
+
+    let recentCourse = null;
+
+    if (recentProgress?.lesson?.course) {
+      // Get the course details
+      recentCourse = await Course.findById(recentProgress.lesson.course).lean();
+
+      if (recentCourse) {
+        // Count total lessons in the course
+        const totalLessons = await Lesson.countDocuments({
+          course: recentCourse._id,
+          createdBy: userId,
+        });
+
+        // Count how many lessons the user has completed for this course
+        const completedLessons = await Lesson.countDocuments({
+          course: recentCourse._id,
+          createdBy: userId,
+          completionDate: { $exists: true, $ne: null },
+        });
+
+        // Calculate progress percentage
+        const progress =
+          totalLessons === 0
+            ? 0
+            : Math.round((completedLessons / totalLessons) * 100);
+
+        // Attach progress to recentCourse object
+        recentCourse.progress = progress;
+      }
+    }
+
+    // 6. Get the latest updated lesson created by the user (acts as upcoming lesson)
+    const upcomingLessons = await Lesson.findOne({
+      createdBy: userId,
+      completionDate: { $eq: null },
+    })
+      .sort({ updatedAt: -1 })
+
+    // 7. Send the final response
+    return res.status(200).json({
+      message: "Data found",
+      stats: {
+        totalCourses,
+        lessonCompleted, 
+        quizAttempted,
+        totalFlashCards,
+        recentCourse,
+        upcomingLessons, 
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching user stats:", error);
+    return res.status(500).json({
+      message: "An error occurred while fetching user stats.",
+      error: error.message,
+    });
   }
 };
