@@ -68,30 +68,54 @@ export const createCourse = async (req, res) => {
 
 export const deleteCourse = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { id: courseId } = req.params;
 
-    const lessons = await Lesson.find({ course: id });
-
+    // Step 1: Find all lessons related to the course
+    const lessons = await Lesson.find({ course: courseId });
     const lessonIds = lessons.map((lesson) => lesson._id);
 
-    await Quiz.deleteMany({ course: id, lesson: { $in: lessonIds } });
-    await FlashCard.deleteMany({ course: id, lesson: { $in: lessonIds } });
+    // Step 2: Find all quizzes related to the course or its lessons
+    const quizzes = await Quiz.find({
+      $or: [{ course: courseId }, { lesson: { $in: lessonIds } }]
+    });
+    const quizIds = quizzes.map((quiz) => quiz._id);
 
-    await Lesson.deleteMany({ course: id });
+    // Step 3: Delete all related quizzes
+    await Quiz.deleteMany({
+      _id: { $in: quizIds }
+    });
 
-    const deletedCourse = await Course.findByIdAndDelete(id);
+    // Step 4: Delete all related flashcards
+    await FlashCard.deleteMany({
+      $or: [{ course: courseId }, { lesson: { $in: lessonIds } }]
+    });
+
+    // Step 5: Delete all related progress (linked to lesson or quiz)
+    await Progress.deleteMany({
+      $or: [
+        { lesson: { $in: lessonIds } },
+        { quiz: { $in: quizIds } }
+      ]
+    });
+
+    // Step 6: Delete all lessons under the course
+    await Lesson.deleteMany({ course: courseId });
+
+    // Step 7: Delete the course itself
+    const deletedCourse = await Course.findByIdAndDelete(courseId);
     if (!deletedCourse) {
       return res.status(404).json({ message: "Course not found" });
     }
 
-    return res
-      .status(200)
-      .json({ message: "Course and all related data deleted successfully" });
+    return res.status(200).json({
+      message: "Course and all related quizzes, flashcards, progress, and lessons deleted successfully.",
+    });
   } catch (error) {
     console.error("Error deleting course:", error);
     return res.status(500).json({ message: "Server error" });
   }
 };
+
 
 export const updateCourse = async (req, res) => {
   try {
@@ -190,17 +214,18 @@ export const userStats = async (req, res) => {
       completionDate: { $eq: null },
     })
       .sort({ updatedAt: -1 })
+      .limit(2);
 
     // 7. Send the final response
     return res.status(200).json({
       message: "Data found",
       stats: {
         totalCourses,
-        lessonCompleted, 
+        lessonCompleted,
         quizAttempted,
         totalFlashCards,
         recentCourse,
-        upcomingLessons, 
+        upcomingLessons,
       },
     });
   } catch (error) {

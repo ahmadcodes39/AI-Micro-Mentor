@@ -53,6 +53,7 @@ export const getUserStats = async () => {
       withCredentials: true,
     });
     if (response && response.data) {
+      console.log("stats data ",response.data)
       return response.data;
     } else {
       throw new Error("Unexpected Response from server");

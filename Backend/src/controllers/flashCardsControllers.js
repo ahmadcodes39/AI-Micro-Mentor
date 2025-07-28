@@ -49,10 +49,10 @@ export const getAllFlashCards = async (req, res) => {
     }
 
     const getCards = await FlashCards.find({
-  createdBy: userId,
-  course: courseId,
-  lesson: lessonId,
-}).sort({ createdAt: -1 })
+      createdBy: userId,
+      course: courseId,
+      lesson: lessonId,
+    }).sort({ createdAt: -1 });
 
     if (!getCards.length) {
       return res.status(404).json({ message: "No flashcards found" });

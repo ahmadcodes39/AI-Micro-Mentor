@@ -10,11 +10,12 @@ import {
   createQuizPrompt,
 } from "../../utils/Prompts/agentPrompts.js";
 
-export const createLessonsByAgent = async ({ topic, courseName }) => {
-  console.log("Lesson topic", topic);
+export const createLessonsByAgent = async ({ topic, courseName,userId }) => {
+  // console.log("Lesson topic", topic);
+  // console.log("User is for the createLessonsByAgent ",userId)
 
-  const prompt = createLessonPrompt({ topic, courseName });
-  console.log(`AI prompt ${prompt}`);
+  const prompt = createLessonPrompt({ topic, courseName,userId });
+  // console.log(`AI prompt ${prompt}`);
 
   let aiResponse = await callAgent(prompt);
   aiResponse = aiResponse.replace(/<think>[\s\S]*?<\/think>/gi, "").trim();
@@ -68,8 +69,9 @@ export const createLessonsByAgent = async ({ topic, courseName }) => {
   };
 };
 
-export const createInitialLessonsByAgent = async ({ topic }) => {
-  const prompt = createInitialLessonPrompt({ topic });
+export const createInitialLessonsByAgent = async ({ topic,userId }) => {
+  // console.log("User is for the createInitialLessonsByAgent ",userId)
+  const prompt = createInitialLessonPrompt({ topic,userId });
   let aiResponse = await callAgent(prompt);
   aiResponse = aiResponse.replace(/<think>[\s\S]*?<\/think>/gi, "").trim();
 
@@ -131,7 +133,7 @@ export const createFlashCardsByAgent = async ({
   lessonId,
 }) => {
   try {
-    const prompt = createFlashCardsPrompt({ topic });
+    const prompt = createFlashCardsPrompt({ topic,userId });
     let aiResponse = await callAgent(prompt);
 
     aiResponse = aiResponse.replace(/<think>[\s\S]*?<\/think>/gi, "").trim();
@@ -154,7 +156,7 @@ export const createFlashCardsByAgent = async ({
         });
       }
     }
-    console.log("Ai rresponse for the flashcards ", aiResponse);
+    // console.log("Ai rresponse for the flashcards ", aiResponse);
     return flashcards;
   } catch (error) {
     console.error("Flashcard Agent Error:", error.message);
@@ -169,7 +171,7 @@ export const createQuizByAgent = async ({
   courseID,
 }) => {
   try {
-    const prompt = createQuizPrompt({ topic });
+    const prompt = createQuizPrompt({ topic,userId });
     let aiResponse = await callAgent(prompt);
     const titleMatch = aiResponse.match(/Title:\s*(.+)/i);
     const quizTitle = titleMatch ? titleMatch[1].trim() : "Untitled Quiz";
@@ -178,7 +180,7 @@ export const createQuizByAgent = async ({
     const questionPattern =
       /Question:\s*(.+?)\s*A\.\s*(.+?)\s*B\.\s*(.+?)\s*C\.\s*(.+?)\s*D\.\s*(.+?)\s*Answer:\s*([ABCD])\s*Explanation:\s*(.+?)(?=\nQuestion:|\n*$)/gs;
 
-      console.log("ai response for the quiz ", aiResponse)
+      // console.log("ai response for the quiz ", aiResponse)
     const quizQuestions = [];
 
     let match;

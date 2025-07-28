@@ -30,7 +30,6 @@ export const userLessons = async ({ courseId }) => {
   }
 };
 
-
 export const getIndividualLesson = async ({ courseId, lessonId }) => {
   try {
     const response = await api.get(`/lesson/${courseId}/${lessonId}`);

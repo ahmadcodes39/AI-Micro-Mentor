@@ -9,6 +9,7 @@ import {
   createLessonsByAgent,
 } from "../Agent/controllers/agentController.js";
 import slugify from "slugify";
+import Progress from "../models/progressSchema.js";
 
 export const getAllLessons = async (req, res) => {
   try {
@@ -16,7 +17,9 @@ export const getAllLessons = async (req, res) => {
     const lessons = await Lesson.find({
       course: courseId,
       createdBy: req.user._id,
-    }).populate("course", "name").sort(({createdAt:-1}));
+    })
+      .populate("course", "name")
+      .sort({ createdAt: -1 });
 
     if (!lessons || lessons.length === 0) {
       return res
@@ -36,7 +39,6 @@ export const createLesson = async (req, res) => {
     const { courseId } = req.params;
     const { topic, courseName } = req.body;
     const userId = req?.user?._id;
-   
 
     if (!topic || !courseId || !courseName) {
       return res.status(400).json({
@@ -44,16 +46,15 @@ export const createLesson = async (req, res) => {
       });
     }
     const { title, content, duration, resources, tags, aiResponse } =
-      await createLessonsByAgent({ topic, courseName });
+      await createLessonsByAgent({ topic, courseName,userId });
     // Generate base slug
     let baseSlug = slugify(title || "untitled", { lower: true });
     let slug = baseSlug;
     let counter = 1;
 
     // Ensure slug is unique in the Lesson collection
-    while (await Lesson.findOne({ slug })) {
-      slug = `${baseSlug}-${counter++}`;
-    }
+    slug = `${baseSlug}-${String(userId).slice(-4)}-${Date.now()}`;
+
     const new_lesson = await Lesson.create({
       createdBy: userId,
       course: courseId,
@@ -93,16 +94,15 @@ export const createInitialLesson = async (req, res) => {
       });
     }
     const { title, content, duration, resources, tags, aiResponse } =
-      await createInitialLessonsByAgent({ topic });
+      await createInitialLessonsByAgent({ topic, userId });
     // Generate base slug
     let baseSlug = slugify(title || "untitled", { lower: true });
     let slug = baseSlug;
     let counter = 1;
 
     // Ensure slug is unique in the Lesson collection
-    while (await Lesson.findOne({ slug })) {
-      slug = `${baseSlug}-${counter++}`;
-    }
+    slug = `${baseSlug}-${String(userId).slice(-4)}-${Date.now()}`;
+
     const new_lesson = await Lesson.create({
       createdBy: userId,
       course: courseId,
@@ -139,6 +139,7 @@ export const deleteLesson = async (req, res) => {
   }
 
   try {
+    // Step 1: Verify that the lesson exists and belongs to the user
     const lesson = await Lesson.findOne({ _id: lessonId, createdBy: userId });
     if (!lesson) {
       return res
@@ -146,21 +147,37 @@ export const deleteLesson = async (req, res) => {
         .json({ message: "Lesson not found or unauthorized" });
     }
 
-    await Quiz.deleteMany({ course: courseId, lesson: lessonId });
-    await FlashCards.deleteMany({ course: courseId, lesson: lessonId });
+    // Step 2: Get quizzes related to this lesson
+    const quizzes = await Quiz.find({ lesson: lessonId });
+    const quizIds = quizzes.map((quiz) => quiz._id);
 
+    // Step 3: Delete related quizzes, flashcards, and progress
+    await Quiz.deleteMany({ lesson: lessonId });
+    await FlashCards.deleteMany({ lesson: lessonId });
+    await Progress.deleteMany({
+      $or: [
+        { lesson: lessonId },
+        { quiz: { $in: quizIds } }
+      ]
+    });
+
+    // Step 4: Delete the lesson
     await Lesson.findByIdAndDelete(lessonId);
 
+    // Step 5: Remove the lesson reference from the course (if applicable)
     await Course.findByIdAndUpdate(courseId, {
       $pull: { lessons: lessonId },
     });
 
-    return res.status(200).json({ message: "Lesson deleted successfully" });
+    return res.status(200).json({
+      message: "Lesson and all related quizzes, flashcards, and progress deleted successfully",
+    });
   } catch (error) {
     console.error("Error deleting lesson:", error);
     return res.status(500).json({ message: "Failed to delete lesson" });
   }
 };
+
 
 export const getIndividualLesson = async (req, res) => {
   try {
@@ -203,3 +220,4 @@ export const updateLesson = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
+  

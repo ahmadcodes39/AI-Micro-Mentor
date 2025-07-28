@@ -1,10 +1,10 @@
-export const createLessonPrompt = ({ topic, courseName }) => {
+export const createLessonPrompt = ({ topic, courseName, userId }) => {
   const phrasingVariants = [
-    `Create a beginner-friendly lesson on "${topic}" in the context of ${courseName}.`,
-    `Teach someone new about "${topic}" in ${courseName} in a detailed and engaging way.`,
-    `Design a programming lesson for a complete beginner on "${topic}" within ${courseName}.`,
-    `Prepare a self-contained learning module about "${topic}" as part of ${courseName}.`,
-    `You're an expert teacher. Create a complete educational lesson about "${topic}" in ${courseName}.`,
+    `User ${userId} needs a beginner-friendly lesson on "${topic}" for ${courseName}.`,
+    `Teach user ${userId}, who is new to "${topic}", in ${courseName}.`,
+    `Design a personalized programming lesson on "${topic}" in ${courseName} for user ${userId}.`,
+    `Prepare a learning module about "${topic}" in ${courseName} for user ${userId}.`,
+    `As an expert teacher, create a lesson on "${topic}" in ${courseName} specifically for user ${userId}.`,
   ];
 
   const selected =
@@ -25,10 +25,12 @@ Write a clear and concise intro to the topic.
 ## Key Concepts
 - List important concepts as bullet points.
 
-## Code Example
-Provide one or two practical examples with code and explanation.
+## Examples
+If the topic involves technical or programming concepts, include one or two **code examples** with explanation.  
+Otherwise, provide **practical, real-world examples** relevant to the subject.
 
-## Summary
+
+## Summary 
 Give a brief recap of the key ideas covered.
 
 ## Resources
@@ -49,17 +51,17 @@ tag1, tag2, tag3
 - The response has no <think> or system content
 - The markdown format is strictly followed
 
-(seed:${now})`
+(seed:${now}-user:${userId})`
   );
 };
 
-export const createInitialLessonPrompt = ({ topic }) => {
+export const createInitialLessonPrompt = ({ topic,userId }) => {
   const phrasingVariants = [
-    `Create a beginner-friendly lesson on: "${topic}"`,
-    `Teach someone new about: "${topic}" in a detailed and engaging way.`,
-    `Design a programming lesson for a complete beginner on: "${topic}"`,
-    `Prepare a self-contained learning module on: "${topic}"`,
-    `You're an expert teacher. Create an educational lesson on: "${topic}"`,
+    `User ${userId} needs a beginner-friendly lesson on "${topic}" .`,
+    `Teach user ${userId}, who is new to "${topic}".`,
+    `Design a personalized programming lesson on "${topic}" for user ${userId}.`,
+    `Prepare a learning module about "${topic}"  for user ${userId}.`,
+    `As an expert teacher, create a lesson on "${topic}" specifically for user ${userId}.`,
   ];
 
   const selected =
@@ -69,31 +71,52 @@ export const createInitialLessonPrompt = ({ topic }) => {
 
   return `${selected}.
 
-Include the following sections:
-- A unique **title**
-- A brief and clear **introduction**
-- Key concepts as **bullet points**
-- One or two **code examples**
-- A short **summary**
-- A list of 3–5 **useful resource links** (real URLs, helpful)
-- An estimated time to complete
-- A list of **3 to 5 relevant tags** in plain text format (e.g. javascript, web, frontend)
+### Please include the following sections clearly:
 
-✅ Ensure all sections are fully completed.
-❌ Do NOT use filler phrases like "Let me know if you'd like..."
-✅ Tags must be single words, lowercase, comma-separated, and related to the topic.
-✅ Do NOT use markdown symbols for tags.
+# [Your Title Here]
 
-(seed:${now})`;
+## Introduction
+Write a clear and concise intro to the topic.
+
+## Key Concepts
+- List important concepts as bullet points.
+
+## Examples
+If the topic involves technical or programming concepts, include one or two **code examples** with explanation.  
+Otherwise, provide **practical, real-world examples** relevant to the subject.
+
+
+## Summary 
+Give a brief recap of the key ideas covered.
+
+## Resources
+List 3–5 helpful resources with real URLs:
+- [Link 1](https://...)
+- [Link 2](https://...)
+- [Link 3](https://...)
+
+## Estimated Time to Complete
+X minutes
+
+## Tags
+tag1, tag2, tag3
+
+✅ Make sure:
+- Tags are plain lowercase words, comma-separated (no "#", no markdown formatting)
+- "Estimated Time to Complete" is clearly written as a number in minutes
+- The response has no <think> or system content
+- The markdown format is strictly followed
+
+(seed:${now}-user:${userId})`
 };
 
-export const createFlashCardsPrompt = ({ topic }) => {
+export const createFlashCardsPrompt = ({ topic,userId }) => {
   const promptVariants = [
-    `Generate 5 flashcards on the topic "${topic}".`,
-    `Create 5 flashcards to help a beginner understand "${topic}".`,
-    `You are a tutor. Make 5 simple and helpful flashcards for the topic: "${topic}".`,
-    `Design 5 educational flashcards that clearly explain "${topic}" to a new learner.`,
-    `Provide 5 flashcards for someone studying "${topic}" for the first time.`,
+    `User ${userId} needs a beginner-friendly set of flashcards on "${topic}".`,
+    `Teach user ${userId}, who is new to "${topic}", using 5 clear flashcards.`,
+    `Design 5 personalized flashcards on "${topic}" specifically for user ${userId}.`,
+    `Prepare a learning set of flashcards about "${topic}" for user ${userId}.`,
+    `As an expert, create 5 simple and helpful flashcards on "${topic}" for user ${userId}.`,
   ];
 
   const selectedPrompt =
@@ -122,15 +145,14 @@ Now generate the flashcards.
 (seed:${now})`;
 };
 
-export const createQuizPrompt = ({ topic }) => {
+export const createQuizPrompt = ({ topic,userId }) => {
   const promptVariants = [
-    `Create a multiple-choice quiz with exactly 10 questions on the topic: "${topic}". Also provide a suitable title for the quiz.`,
-    `Design a beginner-level quiz of exactly 10 MCQs about "${topic}" and give it a title.`,
-    `Prepare a quiz of exactly 10 multiple-choice questions for beginners learning "${topic}", and add a quiz title.`,
-    `Generate exactly 10 MCQ-style quiz questions about "${topic}" with explanations, and start with a title for the quiz.`,
-    `You're a helpful tutor. Create a 10-question MCQ quiz on "${topic}" with 4 options and a short explanation per question. Include a quiz title.`,
+    `User ${userId} needs a multiple-choice quiz with exactly 10 questions on the topic "${topic}". Also provide a suitable quiz title.`,
+    `Design a beginner-level quiz of exactly 10 MCQs about "${topic}" specifically for user ${userId}, and include a title.`,
+    `Prepare a quiz of exactly 10 multiple-choice questions for user ${userId} who is learning "${topic}". Add a quiz title.`,
+    `Generate exactly 10 MCQ-style quiz questions about "${topic}" for user ${userId}, each with explanations. Start with a quiz title.`,
+    `As a helpful tutor, create a 10-question MCQ quiz on "${topic}" for user ${userId}", including 4 options per question, short explanations, and a suitable title.`,
   ];
-
   const selectedPrompt =
     promptVariants[Math.floor(Math.random() * promptVariants.length)];
 
@@ -163,3 +185,4 @@ Explanation: [Brief explanation why this option is correct]
 (seed:${now})`;
 };
 
+ 

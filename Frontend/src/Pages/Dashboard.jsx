@@ -83,9 +83,6 @@ const Dashboard = () => {
 
       {(completeData?.recentCourse || completeData?.upcomingLessons) && (
         <>
-          <h2 className="mb-2 text-xl font-semibold text-gray-800">
-            Your Learning Timeline
-          </h2>
           <div className="flex items-center gap-2 md:flex-row flex-col">
             {completeData?.recentCourse && (
               <QuickActions courseData={completeData.recentCourse} />
