@@ -8,7 +8,7 @@ const LessonHeader = ({ name, category,refreshLessons }) => {
   };
 
   return (
-    <div className="flex sticky top-0  z-10 bg-base-100  flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <div className="flex sticky top-0 z-30 bg-base-100 shadow-md flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-4">
       <div className="flex items-center gap-3 flex-wrap">
         <h2 className="text-3xl font-bold text-base-content">{name}</h2>
         <span className="badge badge-primary text-white text-sm">

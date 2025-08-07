@@ -53,14 +53,36 @@ export const getUserStats = async () => {
       withCredentials: true,
     });
     if (response && response.data) {
-      console.log("stats data ",response.data)
+      // console.log("stats data ", response.data);
       return response.data;
     } else {
       throw new Error("Unexpected Response from server");
     }
   } catch (error) {
-    console.error("Error getting stats:", error?.response?.data?.message || error.message);
-    return { error: true, message: error?.response?.data?.message || "Failed to fetch stats" };
+    console.error(
+      "Error getting stats:",
+      error?.response?.data?.message || error.message
+    );
+    return {
+      error: true,
+      message: error?.response?.data?.message || "Failed to fetch stats",
+    };
   }
 };
 
+export const updateCourse = async ({ id, name, description, category }) => {
+  try {
+    const response = await api.put(
+      `/courses/edit-course/${id}`,
+      { name, description, category },
+      { withCredentials: true }
+    );
+    if (response && response.data) {
+      return response.data;
+    } else {
+      throw new Error("Unexpected Response from server");
+    }
+  } catch (error) {
+    console.error("Error adding course " + error?.response?.message);
+  }
+};

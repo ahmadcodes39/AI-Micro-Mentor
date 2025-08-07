@@ -24,7 +24,7 @@ const QuizDialog = ({ content, generateQuiz,getQuizData }) => {
         <div className="modal-box bg-base-100 text-white max-w-3xl overflow-y-auto">
           <h3 className="font-bold text-lg mb-4">
             <Sparkles className="inline mr-2 text-primary" />
-            Generate Quiz for:
+            Generate Quiz for :&nbsp;
             <span className="text-accent">{content}</span>
           </h3>
 

@@ -13,15 +13,15 @@ const LessonDialog = ({refreshLessons,name}) => {
 
   const handleCreate = async (e) => {
     e.preventDefault();
-    console.log("ID ",courseId)
-    console.log("Course Name ",courseName)
-    console.log("lesson Title ",lessonTitle)
+    // console.log("ID ",courseId)
+    // console.log("Course Name ",courseName)
+    // console.log("lesson Title ",lessonTitle)
     setLoading(true);
     if (!lessonTitle.trim()) return;
     const response = await addLesson(courseId, lessonTitle,courseName);
     if (response) {
       toast.success(response.message);
-      console.log(response);
+      // console.log(response);
     }
     setLessonTitle("");
     setLoading(false);

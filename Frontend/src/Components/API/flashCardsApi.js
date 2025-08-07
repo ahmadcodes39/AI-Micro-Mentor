@@ -14,10 +14,10 @@ export const generateInitialFlashCards = async (courseId, lessonId, topic) => {
       return { cards: [] };
     }
   } catch (error) {
-    console.log(
-      "Error in generating the flashcards:",
-      error?.response?.data?.message || error.message
-    );
+    // console.log(
+    //   "Error in generating the flashcards:",
+    //   error?.response?.data?.message || error.message
+    // );
     return { cards: [] };
   }
 };
@@ -34,10 +34,10 @@ export const getUserFlashCards = async (courseId, lessonId) => {
       return { cards: [] };
     }
   } catch (error) {
-    console.log(
-      "Error in getting the flashcards:",
-      error?.response?.data?.message || error.message
-    );
+    // console.log(
+    //   "Error in getting the flashcards:",
+    //   error?.response?.data?.message || error.message
+    // );
     return { cards: [] };
   }
 };

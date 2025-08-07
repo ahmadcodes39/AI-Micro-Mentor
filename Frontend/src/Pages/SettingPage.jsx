@@ -104,7 +104,7 @@ const SettingPage = () => {
         </h1>
       </div>
 
-      <form onSubmit={handleSubmit} className="w-full max-w-xl mt-8 space-y-3">
+      <form onSubmit={handleSubmit} className="w-full max-w-xl mt-8 space-y-3 sm:pb-2 md:pb-0 pb-24">
         <div className="flex gap-4">
           <div className="w-1/2">
             <label className="label text-white font-medium">
@@ -188,7 +188,7 @@ const SettingPage = () => {
           )}
         </div>
 
-        <button type="submit" className="btn btn-primary w-full mt-4">
+        <button type="submit" className="btn btn-primary w-full mt-4 ">
           {loading ? (
             <span className="loading loading-spinner text-secondary"></span>
           ) : (

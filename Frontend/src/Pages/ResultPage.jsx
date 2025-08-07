@@ -82,6 +82,21 @@ const ResultPage = () => {
     doc.save("Quiz_Results.pdf");
   };
 
+  useEffect(() => {
+  window.history.pushState(null, null, window.location.pathname);
+
+  const handlePopState = () => {
+    navigate(`/quiz/${courseId}/${lessonId}`, { replace: true, state: { triggerDownload: true } });
+  };
+
+  window.addEventListener("popstate", handlePopState);
+
+  return () => {
+    window.removeEventListener("popstate", handlePopState);
+  };
+}, [navigate, courseId, lessonId]);
+
+
   if (!resultData) {
     return (
       <div className="flex justify-center items-center h-screen bg-gray-900 text-white">

@@ -94,3 +94,4 @@ export const updateProfile = async ( formData ) => {
     return { message: "Update Profile Error" };
   }
 };
+

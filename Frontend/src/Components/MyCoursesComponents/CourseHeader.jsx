@@ -1,10 +1,13 @@
 import { Plus } from "lucide-react";
 import React, { useState } from "react";
-import CourseDialog from "../Modal/CourseDialog"
+import CourseDialog from "../Modal/CourseDialog";
 
-const CourseHeader = ({refreshCourses , setSearchQuery,searchQuery}) => {
-  
-
+const CourseHeader = ({
+  refreshCourses,
+  setSearchQuery,
+  searchQuery,
+  editingCourse,
+}) => {
   const openDialog = () => {
     document.getElementById("my_modal_1").showModal();
   };
@@ -24,7 +27,7 @@ const CourseHeader = ({refreshCourses , setSearchQuery,searchQuery}) => {
                 className="grow bg-base-300 text-white placeholder:text-gray-400"
                 placeholder="Search courses..."
                 value={searchQuery}
-                onChange={(e)=>setSearchQuery(e.target.value)}
+                onChange={(e) => setSearchQuery(e.target.value)}
               />
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -51,7 +54,10 @@ const CourseHeader = ({refreshCourses , setSearchQuery,searchQuery}) => {
         </div>
       </div>
 
-      <CourseDialog refreshCourses={refreshCourses}/>
+      <CourseDialog
+        refreshCourses={refreshCourses}
+        courseToEdit={editingCourse}
+      />
     </>
   );
 };

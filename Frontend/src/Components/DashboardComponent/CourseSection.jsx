@@ -10,7 +10,7 @@ const CourseSection = ({ extractedData }) => {
   };
 
   return (
-    <div className="flex flex-col gap-4 mt-4 mb-2">
+    <div className="flex flex-col gap-4 mt-4 md:mb-2 mb-16">
       <h1 className="text-2xl text-primary font-bold flex items-center gap-2">
         <GraduationCap /> Courses
       </h1>

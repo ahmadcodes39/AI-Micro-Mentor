@@ -11,12 +11,12 @@ const IndividualLessonDetails = ({
   isDelete,
 }) => {
   return (
-    <div className="flex flex-col gap-4 mt-6 overflow-hidden">
+    <div className="md:p-0 px-6 flex flex-col gap-4 mt-6 overflow-hidden">
       <div className="prose prose-sm md:prose-base lg:prose-lg max-w-none text-base-content leading-relaxed pb-4">
         <ReactMarkdown>{content}</ReactMarkdown>
       </div>
 
-      <div className="flex justify-end pb-5 mr-4 gap-4">
+      <div className="flex justify-end pb-5 mr-4 gap-4 md:mb-0  mb-24">
         <div className="flex items-center gap-2">
           <motion.button
             whileHover={{ scale: 1.1, y: -4 }}

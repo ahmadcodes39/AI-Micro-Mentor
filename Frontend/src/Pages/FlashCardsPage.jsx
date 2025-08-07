@@ -105,7 +105,7 @@ const FlashCardsPage = () => {
             </button>
           </div>
 
-          <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-2 mt-4 ">
+          <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-2 mt-4 md:p-0 sm:p-2 p-3 sm:pb-0 pb-24">
             {flashCards.map((card, index) => (
               <FlashCards
                 key={index}

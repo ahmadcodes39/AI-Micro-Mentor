@@ -34,7 +34,7 @@ const CourseDetailPage = () => {
         if (response && response.lessons.length > 0) {
           setLessons(response.lessons);
         } else if (location.state) {
-          console.log("No lessons found. Starting agent...");
+          // console.log("No lessons found. Starting agent...");
           await handleAgentLessonCreation();
         }
 
@@ -55,7 +55,7 @@ const CourseDetailPage = () => {
     for (let i = 0; i < 1; i++) {
       try {
         const res = await generateInitialLessonsByAgent( location.state, courseId );
-        console.log(`Lesson ${i + 1} created:`, res.lesson);
+        // console.log(`Lesson ${i + 1} created:`, res.lesson);
         toast.success(`Lesson "${res.lesson.title}" created`);
       } catch (err) {
         console.error("Agent Error:", err);
@@ -71,15 +71,15 @@ const CourseDetailPage = () => {
     await wait(5000);
     setLoadingAgent(false);
   };
-  console.log("lesson for curse ",lessons)
+  // console.log("lesson for curse ",lessons)
 
 const courseName = lessons?.[0]?.course?.name || "Untitled Course";
-console.log("course name",courseName)
+// console.log("course name",courseName)
   const tags = lessons[0]?.tags || courseName;
   const totalLessons = lessons.length;
 
   return (
-    <div className="p-4 space-y-6">
+    <div className="p-4 md:space-y-6 space-y-2">
       <LessonHeader
         name={courseName}
         category={courseName.toLowerCase()}
@@ -99,7 +99,7 @@ console.log("course name",courseName)
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:pb-0 pb-24">
           {lessons.map((lesson) => (
             <LessonCards key={lesson._id} lesson={lesson} loading={loading} />
           ))}

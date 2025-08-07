@@ -1,8 +1,10 @@
-import React, { useState } from "react";
-import { addNewCourse } from "../API/coursesApi";
+import React, { useEffect, useState } from "react";
+import { addNewCourse, updateCourse } from "../API/coursesApi";
 import toast from "react-hot-toast";
+import { useParams } from "react-router";
 
-const CourseDialog = ({ refreshCourses }) => {
+const CourseDialog = ({ refreshCourses, courseToEdit }) => {
+  const courseId = useParams()
   const [formData, setFormData] = useState({
     courseName: "",
     shortDescription: "",
@@ -10,9 +12,7 @@ const CourseDialog = ({ refreshCourses }) => {
     otherCategory: "",
   });
 
-  const [loading, setLoading] = useState(false);
-
-  const categories = [
+  const predefinedCategories = [
     "Programming",
     "Web",
     "Frontend",
@@ -21,6 +21,32 @@ const CourseDialog = ({ refreshCourses }) => {
     "Other",
   ];
 
+  const [categories, setCategories] = useState(predefinedCategories);
+
+  useEffect(() => {
+    if (courseToEdit) {
+      const { name, description, category } = courseToEdit;
+
+      // If the category isn't in the list, add it dynamically
+      const normalizedCategory = category?.trim();
+      if (
+        normalizedCategory &&
+        !predefinedCategories.includes(normalizedCategory)
+      ) {
+        setCategories([...predefinedCategories, normalizedCategory]);
+      }
+
+      setFormData({
+        courseName: name || "",
+        shortDescription: description || "",
+        category: normalizedCategory || "",
+        otherCategory: "",
+      });
+    }
+  }, [courseToEdit]);
+
+  const [loading, setLoading] = useState(false);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -28,52 +54,69 @@ const CourseDialog = ({ refreshCourses }) => {
       [name]: value,
     }));
   };
+
   const closeDialog = () => {
     document.getElementById("my_modal_1").close();
-  }; 
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-
-    const finalCategory =
-      formData.category === "Other"
-        ? formData.otherCategory
-        : formData.category;
-
-    const newCourse = {
-      name: formData.courseName,
-      description: formData.shortDescription,
-      category: finalCategory,
-    };
-
-    try {
-      const response = await addNewCourse(newCourse);
-      if (response) {
-        toast.success(response.message);
-        refreshCourses();
-        document.getElementById("my_modal_1").close();
-        setFormData({
-          courseName: "",
-          shortDescription: "",
-          category: "",
-          otherCategory: "",
-        });
-      } else {
-        toast.error("Failed to create course.");
-      }
-    } catch (error) {
-      toast.error("Error while creating course.");
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
   };
+
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setLoading(true);
+
+  const finalCategory =
+    formData.category === "Other"
+      ? formData.otherCategory.trim()
+      : formData.category;
+
+  const courseData = {
+    name: formData.courseName,
+    description: formData.shortDescription,
+    category: finalCategory,
+  };
+
+  try {
+    let response;
+
+    if (courseToEdit?._id) {
+      // EDIT existing course
+      response = await updateCourse({
+        id: courseToEdit._id,
+        ...courseData,
+      });
+    } else {
+      // CREATE new course
+      response = await addNewCourse(courseData);
+    }
+
+    if (response) {
+      toast.success(response.message);
+      refreshCourses();
+      closeDialog();
+      setFormData({
+        courseName: "",
+        shortDescription: "",
+        category: "",
+        otherCategory: "",
+      });
+      setCategories(predefinedCategories);
+    } else {
+      toast.error("Failed to save course.");
+    }
+  } catch (error) {
+    toast.error("Error while saving course.");
+    console.error(error);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <dialog id="my_modal_1" className="modal">
       <div className="modal-box bg-base-100 text-white">
-        <h3 className="font-bold text-xl mb-4">Create New Course</h3>
+        <h3 className="font-bold text-xl mb-4">
+          {courseToEdit?.name ? "Edit Course" : "Create New Course"}
+        </h3>
 
         <form onSubmit={handleSubmit} className="space-y-2">
           <div>
@@ -154,7 +197,9 @@ const CourseDialog = ({ refreshCourses }) => {
               {loading ? (
                 <span className="loading loading-spinner loading-sm"></span>
               ) : (
-                "Create Course"
+                <h1 className="text-sm">
+                  {courseToEdit?.name ? "Edit Course" : "Create Course"}
+                </h1>
               )}
             </button>
           </div>

@@ -8,6 +8,7 @@ const MyCourses = () => {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [editingCourse, setEditingCourse] = useState(null);
 
   const fetchCourses = async () => {
     try {
@@ -33,7 +34,6 @@ const MyCourses = () => {
     fetchCourses();
   };
 
-  // Filter courses based on searchQuery
   const filteredCourses = courses.filter((course) =>
     course?.name?.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -44,11 +44,13 @@ const MyCourses = () => {
         refreshCourses={fetchCourses}
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
+        editingCourse={editingCourse}
       />
       <CourseCards
         courses={filteredCourses}
         loading={loading}
         handleDelete={handleDelete}
+        setEditingCourse={setEditingCourse}
       />
     </div>
   );

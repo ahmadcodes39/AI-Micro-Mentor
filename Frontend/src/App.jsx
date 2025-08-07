@@ -129,7 +129,11 @@ const App = () => {
             path="/result/:courseId/:lessonId"
             element={
               <AppLayout showSideBar={false}>
-                {isAuthenticated ? <ResultPage /> : <Navigate to={"/"} replace={true}/>}
+                {isAuthenticated ? (
+                  <ResultPage />
+                ) : (
+                  <Navigate to={"/"} replace={true} />
+                )}
               </AppLayout>
             }
           />

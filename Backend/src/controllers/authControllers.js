@@ -38,6 +38,7 @@ export const registerUser = async (req, res) => {
     delete userObj.password;
     // console.log("user avatar frmo register function ",userObj.avatar)
     return res.status(201).json({
+      success:true,
       message: "User registered successfully",
       user: userObj,
     });
@@ -100,7 +101,7 @@ export const loginUser = async (req, res) => {
     delete userObj.password;
     return res
       .status(200)
-      .json({ message: "User logged in successfully", userObj });
+      .json({success:true, message: "User logged in successfully", userObj });
   } catch (error) {
     return res.status(500).json({ message: "User not logged in" });
   }

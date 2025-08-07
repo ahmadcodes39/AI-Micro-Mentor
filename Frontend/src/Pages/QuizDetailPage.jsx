@@ -31,7 +31,7 @@ const QuizDetailPage = () => {
       const response = await getSingleQuiz(quizId);
       if (response) {
         setQuizData(response.quiz);
-        console.log(response);
+        // console.log(response);
       } else {
         toast.error(response.message);
       }
@@ -41,7 +41,6 @@ const QuizDetailPage = () => {
 
   useEffect(() => {
     if (timer <= 0) return;
-
     const interval = setInterval(() => {
       setTimer((prev) => {
         if (prev <= 1) {
@@ -55,6 +54,8 @@ const QuizDetailPage = () => {
 
     return () => clearInterval(interval);
   }, [timer]);
+
+  
 
   const formatTime = (seconds) => {
     const m = Math.floor(seconds / 60)
@@ -71,7 +72,7 @@ const QuizDetailPage = () => {
 
       const formattedAnswers = quizData.map((q, index) => ({
         questionId: q._id,
-        selectedAnswer: userAnswers[index] || null,
+        selectedAnswer: userAnswers[index] || "Not Answered",
       }));
 
       const response = await submitQuiz(
@@ -96,6 +97,23 @@ const QuizDetailPage = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+  // Prevent back navigation
+  const handlePopState = (event) => {
+    // Immediately push the same route again to block back
+    navigate(location.pathname, { replace: true });
+  };
+
+  window.history.pushState(null, null, null);
+  window.addEventListener("popstate", handlePopState);
+
+  return () => {
+    window.removeEventListener("popstate", handlePopState);
+  };
+}, [navigate, location.pathname]);
+
+
 
   if (!quizData || quizData.length === 0) {
     return (

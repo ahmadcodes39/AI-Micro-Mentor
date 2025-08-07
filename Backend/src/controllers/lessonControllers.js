@@ -85,8 +85,8 @@ export const createInitialLesson = async (req, res) => {
     const { courseId } = req.params;
     const { topic } = req.body;
     const userId = req?.user?._id;
-    console.log("Initial Lesson ID ", courseId);
-    console.log("Initial Lesson lesson Title ", topic);
+    // console.log("Initial Lesson ID ", courseId);
+    // console.log("Initial Lesson lesson Title ", topic);
 
     if (!topic || !courseId) {
       return res.status(400).json({
@@ -164,7 +164,7 @@ export const deleteLesson = async (req, res) => {
     // Step 4: Delete the lesson
     await Lesson.findByIdAndDelete(lessonId);
 
-    // Step 5: Remove the lesson reference from the course (if applicable)
+    // Step 5: Remove the lesson reference from the course 
     await Course.findByIdAndUpdate(courseId, {
       $pull: { lessons: lessonId },
     });

@@ -77,12 +77,12 @@ const Dashboard = () => {
       <WelcomeHeader />
       <StatsCard cardStats={cardStats} />
 
+      {(completeData?.recentCourse || completeData?.upcomingLessons) && (
+        <>
       <h1 className="mt-4 mb-3 text-2xl font-medium text-primary">
         Next Up in Your Learning
       </h1>
 
-      {(completeData?.recentCourse || completeData?.upcomingLessons) && (
-        <>
           <div className="flex items-center gap-2 md:flex-row flex-col">
             {completeData?.recentCourse && (
               <QuickActions courseData={completeData.recentCourse} />

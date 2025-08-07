@@ -8,7 +8,7 @@ router.post("/register",registerUser)
 router.post("/login",loginUser)
 router.patch("/update-profile",protectedRoute,updatProfile)
 router.post("/logout",logoutUser)
-router.get("/me",protectedRoute,(req,res)=>{
+router.get("/me",protectedRoute,(req,res)=>{ 
     return res.json({user: req.user}) 
 }) 
 

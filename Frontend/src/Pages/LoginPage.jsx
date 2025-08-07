@@ -18,31 +18,38 @@ const LoginPage = () => {
     setErrors((prev) => ({ ...prev, [e.target.name]: "" }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    const newErrors = {};
-    if (!formData.email) newErrors.email = "Email is required";
-    if (!formData.password) {
-      newErrors.password = "Password is required";
-    } else if (formData.password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters";
-    }
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setLoading(true);
+  const newErrors = {};
+  
+  if (!formData.email) newErrors.email = "Email is required";
+  if (!formData.password) newErrors.password = "Password is required";
+  
+  setErrors(newErrors);
 
-    setErrors(newErrors);
-
-    if (Object.keys(newErrors).length === 0) {
+  if (Object.keys(newErrors).length === 0) {
+    try {
       const response = await loginUser(formData);
-      if (response) {
+
+      if (response && response.success) {
         toast.success(response.message);
-        console.log("Logging in with", response.userObj);
         setCurrentUser(response.userObj);
-        setLoading(false);
       } else {
-        toast.error(response.message);
+        toast.error(response?.message || "Invalid credentials");
       }
+
+    } catch (err) {
+      toast.error("An error occurred while logging in.");
+    } finally {
+      // always stop loading spinner
+      setLoading(false);
     }
-  };
+  } else {
+    setLoading(false); // also stop loading if validation fails
+  }
+};
+
 
   return (
     <div className="flex flex-col justify-center items-center min-h-screen bg-base-100 px-4">
@@ -52,17 +59,6 @@ const LoginPage = () => {
       </section>
 
       <div className="bg-base-200 p-6 rounded-md w-full max-w-md shadow-md">
-        <button className="btn w-full mb-4 btn-outline flex items-center justify-center gap-2">
-          <img
-            src="https://www.svgrepo.com/show/475656/google-color.svg"
-            alt="Google"
-            className="w-5 h-5"
-          />
-          Login with Google
-        </button>
-
-        <div className="divider text-gray-400">or</div>
-
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="label text-white font-medium">
@@ -71,6 +67,7 @@ const LoginPage = () => {
             <input
               name="email"
               type="email"
+              required
               placeholder="Enter your email address"
               className={`input input-bordered w-full bg-base-300 text-white ${
                 errors.email ? "input-error" : ""
@@ -92,6 +89,7 @@ const LoginPage = () => {
                 name="password"
                 type={showPassword ? "text" : "password"}
                 placeholder="Enter your password"
+                required
                 className={`input input-bordered w-full bg-base-300 text-white pr-10 ${
                   errors.password ? "input-error" : ""
                 }`}

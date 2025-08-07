@@ -46,7 +46,6 @@ const QuizPage = () => {
     };
 
   useEffect(() => {
-  
     getQuizData();
   }, []);
 
@@ -69,20 +68,22 @@ const QuizPage = () => {
     toast.error("Something went wrong!");
   }
 };
-  console.log("quiz data", quizData);
+
+
+
   return (
     <div>
       <LessonTopBar onLessonLoaded={handleLessonContent} />
       <div className="flex flex-col gap-4">
-        <div className="flex justify-between items-center">
+        <div className="flex md:justify-between justify-around items-center">
           <p className="font-medium text-white text-xl">
             Total Quizes: <span className="text-accent">{totalQuizes}</span>
           </p>
 
-          <div className="flex justify-end items-center mb-4 mt-4">
+          <div className="flex justify-end items-center md:mb-4 md:mt-4">
             <button
               onClick={() => handleOpenModel(lessonContent?.title)}
-              className="btn btn-sm btn-outline btn-accent mr-4"
+              className="btn btn-sm btn-outline btn-accent md:mr-4"
             >
               ✨ Generate Quiz
             </button>
@@ -98,7 +99,7 @@ const QuizPage = () => {
             {loading ? (
               <span className="loading loading-dots loading-lg"></span>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:p-0 p-3 md:pb-0 sm:pb-2 pb-24">
                 {quizData.map((item) => (
                   <QuizCard key={item?._id} quiz={item} />
                 ))}

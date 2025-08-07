@@ -24,32 +24,43 @@ const SignUpPage = () => {
     setErrors((prev) => ({ ...prev, [e.target.name]: "" }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    const newErrors = {};
-    if (!formData.firstname) newErrors.firstname = "First name is required";
-    if (!formData.lastname) newErrors.lastname = "Last name is required";
-    if (!formData.email) newErrors.email = "Email is required";
-    if (!formData.goals) newErrors.goals = "Goal is required";
-    if (!formData.password) {
-      newErrors.password = "Password is required";
-    } else if (formData.password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters";
-    }
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+  setLoading(true);
 
-    setErrors(newErrors);
+  const newErrors = {};
+  if (!formData.firstname) newErrors.firstname = "First name is required";
+  if (!formData.lastname) newErrors.lastname = "Last name is required";
+  if (!formData.email) newErrors.email = "Email is required";
+  if (!formData.goals) newErrors.goals = "Goal is required";
+  if (!formData.password) {
+    newErrors.password = "Password is required";
+  } else if (formData.password.length < 6) {
+    newErrors.password = "Password must be at least 6 characters";
+  }
 
-    if (Object.keys(newErrors).length === 0) {
+  setErrors(newErrors);
+
+  if (Object.keys(newErrors).length === 0) {
+    try {
       const response = await signUpUser(formData);
-      if (response) {
-        toast.success(response.message);
-        console.log("Sign up data ", response);
+
+      if (response && response.success) {
+        toast.success(response.message || "Signed up successfully!");
         setCurrentUser(response.user);
-        setLoading(false);
+        // console.log("Sign up data ", response);
+      } else {
+        toast.error(response?.message || "Signup failed");
       }
+    } catch (err) {
+      toast.error("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
     }
-  };
+  } else {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="flex flex-col justify-center items-center min-h-screen bg-base-100 px-4">
@@ -61,17 +72,6 @@ const SignUpPage = () => {
       </section>
 
       <div className="bg-base-200 p-6 rounded-md w-full max-w-md shadow-md">
-        <button className="btn w-full mb-4 btn-outline flex items-center justify-center gap-2">
-          <img
-            src="https://www.svgrepo.com/show/475656/google-color.svg"
-            alt="Google"
-            className="w-5 h-5"
-          />
-          Sign Up with Google
-        </button>
-
-        <div className="divider text-gray-400">or</div>
-
         <form onSubmit={handleSubmit} className="">
           <div className="flex gap-2">
             <div>
@@ -194,7 +194,7 @@ const SignUpPage = () => {
               <span className="loading loading-spinner text-secondary"></span>
             ) : (
               <>
-                "Sign Up" <MoveRight className="size-5" />
+                Sign Up <MoveRight className="size-5" />
               </>
             )}
           </button>

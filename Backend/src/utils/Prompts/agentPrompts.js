@@ -110,13 +110,13 @@ tag1, tag2, tag3
 (seed:${now}-user:${userId})`
 };
 
-export const createFlashCardsPrompt = ({ topic,userId }) => {
+export const createFlashCardsPrompt = ({ topic, userId }) => {
   const promptVariants = [
-    `User ${userId} needs a beginner-friendly set of flashcards on "${topic}".`,
-    `Teach user ${userId}, who is new to "${topic}", using 5 clear flashcards.`,
-    `Design 5 personalized flashcards on "${topic}" specifically for user ${userId}.`,
-    `Prepare a learning set of flashcards about "${topic}" for user ${userId}.`,
-    `As an expert, create 5 simple and helpful flashcards on "${topic}" for user ${userId}.`,
+    `User ${userId} is studying the topic "${topic}" and needs flashcards to understand the core concepts.`,
+    `Generate 5 helpful flashcards for user ${userId} who is learning about "${topic}". Focus on key concepts only.`,
+    `Teach user ${userId} "${topic}" using flashcards that highlight important ideas, definitions, and techniques.`,
+    `Create 5 educational flashcards for user ${userId} based on the core lessons of "${topic}". Avoid metadata.`,
+    `User ${userId} is learning "${topic}". Generate flashcards that test understanding of its fundamental principles.`,
   ];
 
   const selectedPrompt =
@@ -126,24 +126,35 @@ export const createFlashCardsPrompt = ({ topic,userId }) => {
 
   return `${selectedPrompt}
 
-Each flashcard should follow **exactly** this format, without any markdown, asterisks, or extra symbols:
+The content is based on a lesson about "${topic}". Please **ignore** unrelated sections like:
+- Tags
+- Resources
+- Summary
+- Code samples (unless explaining a concept)
+- Metadata like estimated time, author info, etc.
 
-Front: [your question or keyword here]
-Back: [a concise and beginner-friendly explanation or answer here]
+Focus only on the **core concepts**, **definitions**, and **key takeaways** from the lesson body.
 
-✅ Use plain text only.  
-✅ Do not use bold text, bullet points, or headers.  
-✅ Each flashcard must be clearly separated by a new line starting with "Front:".  
-✅ Keep answers short, clear, and easy to understand.
+Each flashcard must follow **exactly** this format (no markdown, no extra formatting):
+
+Front: [Your question or keyword here]  
+Back: [A concise and beginner-friendly explanation or answer here]
+
+✅ Use plain text only  
+✅ Do NOT use markdown, bullet points, asterisks, or headers  
+✅ Focus on essential concepts from the main lesson content  
+✅ Skip tags, metadata, and summary unless conceptually important  
+✅ Keep explanations short, simple, and clear
 
 Example:
-Front: What is a variable?
-Back: A variable is a name that stores a value in a program.
+Front: What is data-driven decision making?  
+Back: It is the process of using data analysis to guide business or organizational decisions.
 
 Now generate the flashcards.
 
 (seed:${now})`;
 };
+
 
 export const createQuizPrompt = ({ topic,userId }) => {
   const promptVariants = [
