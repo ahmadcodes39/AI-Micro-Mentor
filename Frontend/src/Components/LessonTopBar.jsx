@@ -3,7 +3,7 @@ import toast from "react-hot-toast";
 import { useParams } from "react-router";
 import { getIndividualLesson } from "../Components/API/lessonApi";
 import IndividualLessonHeader from "../Components/LessonComponent/IndividualLessonHeader";
-import { customsReadingTime } from "../Components/utility/calculateTime";
+import { customsReadingTime } from "../Components/utility/CalculateTime";
 
 const LessonTopBar = ({ onLessonLoaded }) => {
   const [lesson, setLesson] = useState(null);
