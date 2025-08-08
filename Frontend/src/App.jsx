@@ -9,7 +9,7 @@ import MyCourses from "./Pages/MyCourses";
 import CourseDetailPage from "./Pages/CourseDetailPage";
 import AppLayout from "./Components/Layout/AppLayout";
 import { getCurrentUser } from "./Components/API/authApi";
-import { AuthContext } from "./Components/Context/authContext";
+import { AuthContext } from "./Components/Context/AuthContext";
 import LessonDetailPage from "./Pages/LessonDetailPage";
 import FlashCardsPage from "./Pages/FlashCardsPage";
 import QuizPage from "./Pages/QuizPage";
