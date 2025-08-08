@@ -1,6 +1,6 @@
 import React from "react";
 import { useContext } from "react";
-import { AuthContext } from "../ContextAauthContext";
+import { AuthContext } from "../Context/AuthContext";
 
 const WelcomeHeader = () => {
   const { currentUser } = useContext(AuthContext);
