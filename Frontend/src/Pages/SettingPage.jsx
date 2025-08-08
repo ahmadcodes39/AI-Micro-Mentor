@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { getCurrentUser, updateProfile } from "../Components/API/authApi";
 import { UserRoundPen, MoveRight, RefreshCcw } from "lucide-react";
 import toast from "react-hot-toast";
-import { AuthContext } from "../Components/Context/authContext";
+import { AuthContext } from "../Components/Context/AuthContext";
 import { useNavigate } from "react-router";
 
 const SettingPage = () => {

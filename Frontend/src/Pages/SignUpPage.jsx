@@ -3,7 +3,7 @@ import { Eye, EyeOff, MoveRight } from "lucide-react";
 import { Link } from "react-router";
 import { signUpUser } from "../Components/API/authApi";
 import toast from "react-hot-toast";
-import { AuthContext } from "../Components/Context/authContext";
+import { AuthContext } from "../Components/Context/AuthContext";
 
 const SignUpPage = () => {
   const [showPassword, setShowPassword] = useState(false);
