@@ -17,7 +17,7 @@ import React, { useContext, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { logoutUser } from "../API/authApi";
 import toast from "react-hot-toast";
-import { AuthContext } from "../Context/authContext";
+import { AuthContext } from "../Context/AuthContext";
 import MobileNav from "./MobileNav";
 
 const SideBar = () => {

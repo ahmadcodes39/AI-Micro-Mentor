@@ -7,7 +7,7 @@ import {
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { useContext, useState } from "react";
-import { AuthContext } from "../Context/authContext";
+import { AuthContext } from "../Context/AuthContext";
 
 const MobileNav = ({ handleLogout }) => {
   const { currentUser } = useContext(AuthContext);
