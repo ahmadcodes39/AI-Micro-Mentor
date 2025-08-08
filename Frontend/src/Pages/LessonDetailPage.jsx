@@ -3,7 +3,7 @@ import toast from "react-hot-toast";
 import { useNavigate, useParams } from "react-router";
 import { deleteLesson, getIndividualLesson, updateLesson } from "../Components/API/lessonApi";
 import IndividualLessonHeader from "../Components/LessonComponent/IndividualLessonHeader";
-import { customsReadingTime } from "../Components/utility/calculateTime";
+import { customsReadingTime } from "../Components/utility/CalculateTime";
 import IndividualLessonDetails from "../Components/LessonComponent/IndividualLessonDetails";
 
 const LessonDetailPage = () => {
