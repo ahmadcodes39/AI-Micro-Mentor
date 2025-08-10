@@ -20,10 +20,15 @@ app.get("/", (req, res) => {
   res.send("App is running");
 });
 app.use(cors({
-  origin: "https://ai-micro-mentor-git-main-ahmadcodes39-gmailcoms-projects.vercel.app/", 
+  origin: [
+    "https://ai-micro-mentor.vercel.app",
+    "https://ai-micro-mentor-git-main-ahmadcodes39-gmailcoms-projects.vercel.app",
+    "http://localhost:5173"
+  ],
   methods: ["GET", "PUT", "POST", "DELETE", "PATCH"],
-  credentials: true               
+  credentials: true
 }));
+
      
 
 app.use("/api/auth", authRoutes);
