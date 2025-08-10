@@ -22,12 +22,12 @@ app.get("/", (req, res) => {
 app.use(cors({
   origin: [
     "https://ai-micro-mentor.vercel.app",
-    "https://ai-micro-mentor-git-main-ahmadcodes39-gmailcoms-projects.vercel.app",
     "http://localhost:5173"
   ],
-  methods: ["GET", "PUT", "POST", "DELETE", "PATCH"],
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
   credentials: true
 }));
+
 
      
 

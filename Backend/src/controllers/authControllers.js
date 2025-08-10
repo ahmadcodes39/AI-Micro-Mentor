@@ -51,34 +51,6 @@ export const registerUser = async (req, res) => {
     return res.status(500).json({ message: "Something went wrong" });
   }
 };
-
-export const updatProfile = async (req, res) => {
-  const { firstname, lastname,email, goals, avatar } = req.body;
-  try {
-    const userId = req?.user?._id;
-
-    const findUser = await User.findByIdAndUpdate(userId,{
-      firstname,
-      lastname,
-      email,
-      goals,
-      avatar,
-    }, { new: true }); 
-
-    if (findUser) {
-      return res
-        .status(200)
-        .json({ message: "Profile Updated Successfully", user: findUser });
-    }
-  } catch (error) {
-    return res.status(500).json({
-  message: "Server Error",
-  error: error?.message || "Unknown error",
-});
-
-  }
-};
-
 export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -108,6 +80,34 @@ export const loginUser = async (req, res) => {
     return res.status(500).json({ message: "User not logged in" });
   }
 };
+export const updatProfile = async (req, res) => {
+  const { firstname, lastname,email, goals, avatar } = req.body;
+  try {
+    const userId = req?.user?._id;
+
+    const findUser = await User.findByIdAndUpdate(userId,{
+      firstname,
+      lastname,
+      email,
+      goals,
+      avatar,
+    }, { new: true }); 
+
+    if (findUser) {
+      return res
+        .status(200)
+        .json({ message: "Profile Updated Successfully", user: findUser });
+    }
+  } catch (error) {
+    return res.status(500).json({
+  message: "Server Error",
+  error: error?.message || "Unknown error",
+});
+
+  }
+};
+
+
 
 export const logoutUser = async (req, res) => {
   res.clearCookie("token", {
