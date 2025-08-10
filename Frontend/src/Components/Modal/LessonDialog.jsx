@@ -52,7 +52,7 @@ const LessonDialog = ({refreshLessons,name}) => {
             <form method="dialog">
               <button className="btn btn-outline" disabled={loading}>Cancel</button>
             </form>
-            <button type="submit" className="btn btn-primary text-white">
+            <button type="submit" className="btn btn-primary text-white" disabled={loading}>
               {loading ? (
                 <div className="flex items-center justify-center gap-1">
                   <Bot className="h-6 w-6 text-white animate-bounce" />

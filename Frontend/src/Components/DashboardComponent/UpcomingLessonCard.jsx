@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router";
 
 const UpcomingLessonCard = ({ lesson }) => {
-  console.log("lesson data",lesson)
+  // console.log("lesson data",lesson)
   const navigate = useNavigate()
   const handleNavigation = (course,id)=>{
     navigate(`/lesson/${course}/${id}`)
