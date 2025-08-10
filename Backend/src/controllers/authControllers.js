@@ -27,12 +27,13 @@ export const registerUser = async (req, res) => {
     });
 
     const token = generateAuthToken(user);
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+   res.cookie("token", token, {
+  httpOnly: true,
+  secure: true, // for HTTPS
+  sameSite: "none", // required for cross-site cookies
+  maxAge: 7 * 24 * 60 * 60 * 1000,
+});
+
 
     const userObj = user.toObject();
     delete userObj.password;
@@ -90,12 +91,13 @@ export const loginUser = async (req, res) => {
       return res.status(400).json({ message: "Invalid email or password" });
 
     const token = generateAuthToken(findUser);
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+   res.cookie("token", token, {
+  httpOnly: true,
+  secure: true, // for HTTPS
+  sameSite: "none", // required for cross-site cookies
+  maxAge: 7 * 24 * 60 * 60 * 1000,
+});
+
     const userObj = findUser.toObject();
     // console.log("user avatar from backend",userObj.avatar)
     delete userObj.password;
