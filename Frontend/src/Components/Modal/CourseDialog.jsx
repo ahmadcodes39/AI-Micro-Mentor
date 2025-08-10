@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 import { useParams } from "react-router";
 
 const CourseDialog = ({ refreshCourses, courseToEdit }) => {
-  const courseId = useParams()
+  const courseId = useParams();
   const [formData, setFormData] = useState({
     courseName: "",
     shortDescription: "",
@@ -22,13 +22,14 @@ const CourseDialog = ({ refreshCourses, courseToEdit }) => {
   ];
 
   const [categories, setCategories] = useState(predefinedCategories);
+  const [newError, setNewError] = useState({});
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (courseToEdit) {
       const { name, description, category } = courseToEdit;
-
-      // If the category isn't in the list, add it dynamically
       const normalizedCategory = category?.trim();
+
       if (
         normalizedCategory &&
         !predefinedCategories.includes(normalizedCategory)
@@ -45,71 +46,95 @@ const CourseDialog = ({ refreshCourses, courseToEdit }) => {
     }
   }, [courseToEdit]);
 
-  const [loading, setLoading] = useState(false);
+  const validateField = (name, value) => {
+    let errorMsg = "";
 
-  const handleChange = (e) => {
+    if (name === "courseName") {
+      if (!value.trim() || value.trim().length < 3) {
+        errorMsg = "Name must be at least 3 characters";
+      }
+    }
+
+    if (name === "shortDescription") {
+      if (!value.trim() || value.trim().length < 10) {
+        errorMsg = "Description must be at least 10 characters";
+      }
+    }
+
+    return errorMsg;
+  };
+
+ const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
-  };
-
-  const closeDialog = () => {
+  };  const closeDialog = () => { 
     document.getElementById("my_modal_1").close();
   };
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  setLoading(true);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
 
-  const finalCategory =
-    formData.category === "Other"
-      ? formData.otherCategory.trim()
-      : formData.category;
+    const errors = {};
+    if (validateField("courseName", formData.courseName)) {
+      errors.name = validateField("courseName", formData.courseName);
+    }
+    if (validateField("shortDescription", formData.shortDescription)) {
+      errors.description = validateField("shortDescription", formData.shortDescription);
+    }
 
-  const courseData = {
-    name: formData.courseName,
-    description: formData.shortDescription,
-    category: finalCategory,
+    setNewError(errors);
+
+    if (Object.keys(errors).length === 0) {
+      const finalCategory =
+        formData.category === "Other"
+          ? formData.otherCategory.trim()
+          : formData.category;
+
+      const courseData = {
+        name: formData.courseName.trim(),
+        description: formData.shortDescription.trim(),
+        category: finalCategory,
+      };
+
+      try {
+        let response;
+        if (courseToEdit?._id) {
+          response = await updateCourse({
+            id: courseToEdit._id,
+            ...courseData,
+          });
+        } else {
+          response = await addNewCourse(courseData);
+        }
+
+        if (response) {
+          toast.success(response.message);
+          refreshCourses();
+          closeDialog();
+          setFormData({
+            courseName: "",
+            shortDescription: "",
+            category: "",
+            otherCategory: "",
+          });
+          setCategories(predefinedCategories);
+        } else {
+          toast.error("Failed to save course.");
+        }
+      } catch (error) {
+        toast.error("Error while saving course.");
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      setLoading(false);
+    }
   };
-
-  try {
-    let response;
-
-    if (courseToEdit?._id) {
-      // EDIT existing course
-      response = await updateCourse({
-        id: courseToEdit._id,
-        ...courseData,
-      });
-    } else {
-      // CREATE new course
-      response = await addNewCourse(courseData);
-    }
-
-    if (response) {
-      toast.success(response.message);
-      refreshCourses();
-      closeDialog();
-      setFormData({
-        courseName: "",
-        shortDescription: "",
-        category: "",
-        otherCategory: "",
-      });
-      setCategories(predefinedCategories);
-    } else {
-      toast.error("Failed to save course.");
-    }
-  } catch (error) {
-    toast.error("Error while saving course.");
-    console.error(error);
-  } finally {
-    setLoading(false);
-  }
-};
-
 
   return (
     <dialog id="my_modal_1" className="modal">
@@ -124,31 +149,34 @@ const handleSubmit = async (e) => {
             <input
               type="text"
               name="courseName"
-              required
               placeholder="Enter course name"
               className="input input-bordered w-full bg-base-300 text-white"
               value={formData.courseName}
               onChange={handleChange}
             />
+            {newError.name && (
+              <p className="text-sm text-red-500 mt-1">{newError.name}</p>
+            )}
           </div>
 
           <div>
             <label className="label font-medium">Short Description</label>
             <textarea
               name="shortDescription"
-              required
               placeholder="Enter short description"
               className="textarea textarea-bordered w-full bg-base-300 text-white"
               value={formData.shortDescription}
               onChange={handleChange}
             />
+            {newError.description && (
+              <p className="text-sm text-red-500 mt-1">{newError.description}</p>
+            )}
           </div>
 
           <div>
             <label className="label font-medium">Category</label>
             <select
               name="category"
-              required
               className="select select-bordered w-full bg-base-300 text-white"
               value={formData.category}
               onChange={handleChange}
@@ -168,7 +196,6 @@ const handleSubmit = async (e) => {
               <input
                 type="text"
                 name="otherCategory"
-                required
                 placeholder="Enter your custom category"
                 className="input input-bordered w-full bg-base-300 text-white"
                 value={formData.otherCategory}
