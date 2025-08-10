@@ -32,11 +32,8 @@ const Footer = () => {
         <div className="flex flex-col gap-2">
           <h3 className="font-semibold mb-1">Follow Us</h3>
           <div className="flex gap-4">
-            <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="hover:text-primary">
+            <a href="https://github.com/ahmadcodes39" target="_blank" rel="noopener noreferrer" className="hover:text-primary">
               <Github className="w-5 h-5" />
-            </a>
-            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="hover:text-primary">
-              <Twitter className="w-5 h-5" />
             </a>
             <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="hover:text-primary">
               <Linkedin className="w-5 h-5" />
