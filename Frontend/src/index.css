@@ -50,3 +50,7 @@
 .flip-card-back {
   transform: rotateY(180deg);
 }
+
+body {
+  background-color: #1d232a;
+}
