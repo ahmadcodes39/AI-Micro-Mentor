@@ -51,6 +51,6 @@
   transform: rotateY(180deg);
 }
 
-body {
+html, body {
   background-color: #1d232a;
 }
