@@ -76,26 +76,23 @@ export const deleteCourse = async (req, res) => {
 
     // Step 2: Find all quizzes related to the course or its lessons
     const quizzes = await Quiz.find({
-      $or: [{ course: courseId }, { lesson: { $in: lessonIds } }]
+      $or: [{ course: courseId }, { lesson: { $in: lessonIds } }],
     });
     const quizIds = quizzes.map((quiz) => quiz._id);
 
     // Step 3: Delete all related quizzes
     await Quiz.deleteMany({
-      _id: { $in: quizIds }
+      _id: { $in: quizIds },
     });
 
     // Step 4: Delete all related flashcards
     await FlashCard.deleteMany({
-      $or: [{ course: courseId }, { lesson: { $in: lessonIds } }]
+      $or: [{ course: courseId }, { lesson: { $in: lessonIds } }],
     });
 
     // Step 5: Delete all related progress (linked to lesson or quiz)
     await Progress.deleteMany({
-      $or: [
-        { lesson: { $in: lessonIds } },
-        { quiz: { $in: quizIds } }
-      ]
+      $or: [{ lesson: { $in: lessonIds } }, { quiz: { $in: quizIds } }],
     });
 
     // Step 6: Delete all lessons under the course
@@ -108,14 +105,14 @@ export const deleteCourse = async (req, res) => {
     }
 
     return res.status(200).json({
-      message: "Course and all related quizzes, flashcards, progress, and lessons deleted successfully.",
+      message:
+        "Course and all related quizzes, flashcards, progress, and lessons deleted successfully.",
     });
   } catch (error) {
     console.error("Error deleting course:", error);
     return res.status(500).json({ message: "Server error" });
   }
 };
-
 
 export const updateCourse = async (req, res) => {
   try {
@@ -148,10 +145,13 @@ export const userStats = async (req, res) => {
   try {
     // 1. Count total number of courses created by the user
     const totalCourses = await Course.countDocuments({ createdBy: userId });
+    const totalLessonsByUser = await Course.countDocuments({
+      createdBy: userId,
+    });
 
     // 2. Count total number of completed lessons
     const lessonCompleted = await Lesson.countDocuments({
-      completionDate: { $ne: null },
+      $and: [{ createdBy: userId }, { completionDate: { $ne: null } }],
     });
 
     // 3. Count total number of quizzes attempted by the user
@@ -224,6 +224,7 @@ export const userStats = async (req, res) => {
         lessonCompleted,
         quizAttempted,
         totalFlashCards,
+        totalLessonsByUser,
         recentCourse,
         upcomingLessons,
       },

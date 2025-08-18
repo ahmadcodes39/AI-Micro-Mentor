@@ -10,13 +10,13 @@ const statsConfig = [
     bg: "bg-[rgba(59,130,246,0.1)]", 
     iconColor: "text-blue-500",
   },
-  {
-    title: "Lessons Completed",
-    key: "lessonCompleted",
-    icon: <Clipboard size={24} />,
-    bg: "bg-[rgba(250,204,21,0.1)]", 
-    iconColor: "text-yellow-500",
-  },
+  // {
+  //   title: "Lessons Completed",
+  //   key: "lessonCompleted",
+  //   icon: <Clipboard size={24} />,
+  //   bg: "bg-[rgba(250,204,21,0.1)]", 
+  //   iconColor: "text-yellow-500",
+  // },
   {
     title: "Quizzes Attempted",
     key: "quizAttempted",
